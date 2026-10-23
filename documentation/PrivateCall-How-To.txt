@@ -1,0 +1,115 @@
+PRIVATECALL - HOW TO MAKE A CALL
+================================
+
+No account, installation, terminal, or programming knowledge is needed.
+Both participants simply open the HTML file.
+
+BEFORE YOU START
+- Both of you need the file PrivateCall.html and an internet connection.
+- Open it in Google Chrome. (Chrome is the browser PrivateCall was
+  tested with.)
+- You also need another way to send each other a message, such as a
+  chat app or e-mail.
+- To find a connection, PrivateCall contacts public helper servers run by
+  Google and Cloudflare. Some networks also need a relay server (see
+  "Troubleshooting").
+
+
+PERSON A - STARTS THE CALL
+1. Open PrivateCall.html and click "Start a call".
+2. Choose "Video call" or "Voice call". When the browser asks, allow the
+   microphone (and the camera).
+3. Wait a moment. On some networks this takes up to 30 seconds.
+4. Under "Send this invitation", click "Copy". Send the whole message to
+   Person B in any app. (Or click "Save as file" and send the file.)
+5. Keep the window open. When Person B's reply arrives, copy all of it.
+   Under "Add their reply", click "Paste". You can also paste into the
+   box, or click "Open file" for a reply file.
+   The call starts by itself.
+
+
+PERSON B - JOINS THE CALL
+1. Open PrivateCall.html and click "Join a call".
+2. Copy the whole invitation you received. Under "Add the invitation",
+   click "Paste". You can also paste into the box, or click "Open file".
+3. Click "Join with camera" or "Join with microphone only".
+   (For a voice call the button is "Join the voice call".)
+   When the browser asks, allow the microphone (and the camera).
+4. Under "Send this reply back", click "Copy" and send the whole reply
+   to Person A.
+5. Wait. The screen says: "Waiting for them to add your reply. The call
+   starts automatically."
+
+
+COPY THE WHOLE MESSAGE
+Each message starts with a sentence, for example:
+   Join my private call: open PrivateCall, choose "Join a call",
+   and paste this whole message.
+Then comes the line "PrivateCall.invite.v1:" (or "PrivateCall.reply.v1:"),
+lines of letters and numbers, and finally ":end".
+Copy and send everything, from the first sentence to ":end".
+Do not change anything. An invitation can be used for one call only.
+
+
+CHECK THE SECURITY CODE (BOTH OF YOU)
+When the call connects, both screens show the same 6-digit code, for
+example:  482 917
+Until you click "Codes match", the other person can't see you. They can
+hear you only while your microphone is turned on in this code panel.
+
+- Person A clicks "Turn on microphone" and says the FIRST three digits:
+  "four eight two".
+- Person B clicks "Turn on microphone" and says the LAST three digits:
+  "nine one seven".
+- Each of you compares what you hear with your own screen.
+- Only if everything matches, click "Codes match". Each of you clicks it
+  on your own screen. Your camera and microphone are sent normally only
+  after you do.
+
+If the codes are different: click "Codes don't match". The call ends.
+Do not continue. Start a new call, and send the invitation through a
+different app if you can.
+
+A stronger check: a skilled attacker could imitate a voice. For more
+certainty, compare the code as text in a different app you trust.
+Click "Copy code" and send it there. Both codes must be the same.
+
+
+DURING THE CALL
+- "Microphone" - turn your microphone off or on (or press M).
+- "Camera"     - turn your camera off or on (or press V).
+- "Leave"      - end the call.
+- "Details"    - information about the connection.
+- If you see "Click to turn on sound", click it to hear the other person.
+
+
+TROUBLESHOOTING
+Permission denied
+  The message says PrivateCall wasn't allowed to use your microphone or
+  camera. Click the icon in the browser's address bar, allow access,
+  then try again.
+
+No sound
+  Click "Click to turn on sound" if you see it. Check your speaker or
+  headset volume. Before the other person clicks "Codes match", you
+  normally hear them only while their microphone is turned on in the
+  code panel.
+
+Invitation or reply not accepted
+  Copy the whole message again, from the first sentence to ":end", or
+  send it as a file ("Save as file" and "Open file"). The invitation
+  goes into "Join a call". The reply goes back to the computer that
+  started the call. A used invitation does not work again; ask for a
+  new one.
+
+"Couldn't connect"
+  Start again and exchange a new invitation and reply quickly, within a
+  few minutes. Try a different network for one of you, such as a phone
+  hotspot or home Wi-Fi.
+
+When a relay may be needed
+  If calls keep failing, especially on office, school, mobile or other
+  restricted networks, you may need a relay server. Someone you trust
+  who runs one can give you a relay code that starts with "PCRELAY1:".
+  Open "Connection settings", paste the code, and click "Use this relay".
+  Only one of you needs it.

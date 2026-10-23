@@ -1,0 +1,186 @@
+{
+  "date": "2026-10-23T19:14:57.924Z",
+  "browser": "Chromium 153.0.8010.12",
+  "metrics": {
+    "browserVersion": "153.0.8010.12",
+    "coneInviteMs": 335,
+    "symmetricFailMs": 45618,
+    "udpBlockedRelayInviteMs": 15144,
+    "stunUnreachableInviteMs": 15137,
+    "mixedRelayInviteMs": 15115,
+    "slow90": "connected",
+    "slow200": "connected"
+  },
+  "results": [
+    {
+      "name": "home NATs: direct connection through STUN",
+      "topo": {
+        "natA": "cone",
+        "natB": "cone"
+      },
+      "ok": true,
+      "ms": 7570,
+      "checks": [
+        "ok   invitation has a public (srflx) address: host:udp:192.168.1.10, srflx:udp:203.0.113.2, host:tcp:192.168.1.10",
+        "ok   invitation ready in 0.3 s (servers reachable, gathering completes quickly)",
+        "ok   direct path through both NATs: srflx/udp 203.0.113.2 ⇄ srflx/udp 198.51.100.2",
+        "ok   codes match",
+        "ok   audio flows after verification",
+        "ok   details show a direct route"
+      ]
+    },
+    {
+      "name": "symmetric NATs, no relay: fails clearly",
+      "topo": {
+        "natA": "symmetric",
+        "natB": "symmetric"
+      },
+      "ok": true,
+      "ms": 48748,
+      "checks": [
+        "ok   A sees \"Couldn’t connect\" after 46 s",
+        "ok   diagnostics: What your computer found: local network address, public address."
+      ]
+    },
+    {
+      "name": "symmetric NATs, relay on one side (TURN/UDP)",
+      "topo": {
+        "natA": "symmetric",
+        "natB": "symmetric"
+      },
+      "ok": true,
+      "ms": 6431,
+      "checks": [
+        "ok   invitation contains a relay candidate",
+        "ok   relay credentials are not inside the invitation",
+        "ok   connected through the relay: relay/udp/udp 192.0.2.10 ⇄ prflx/udp ",
+        "ok   codes match (relay is not in the middle of the encryption)",
+        "ok   audio flows"
+      ]
+    },
+    {
+      "name": "UDP blocked on one side, relay over TCP",
+      "topo": {
+        "natA": "udp-blocked",
+        "natB": "cone"
+      },
+      "ok": true,
+      "ms": 21232,
+      "checks": [
+        "ok   invitation contains a relay candidate (host:udp:192.168.1.10, relay:udp:192.0.2.10, host:tcp:192.168.1.10); ready after 15.1 s",
+        "ok   A reaches the relay over TCP: relay/udp/tcp 192.0.2.10 ⇄ srflx/udp 198.51.100.2",
+        "ok   audio flows"
+      ]
+    },
+    {
+      "name": "only TCP 443 allowed, relay over TLS (valid-certificate stand-in)",
+      "topo": {
+        "natA": "tcp443-only",
+        "natB": "symmetric"
+      },
+      "ok": true,
+      "ms": 21355,
+      "checks": [
+        "ok   invitation contains a relay candidate (host:udp:192.168.1.10, relay:udp:192.0.2.10, host:tcp:192.168.1.10)",
+        "ok   A reaches the relay over TLS on port 443: relay/udp/tls 192.0.2.10",
+        "ok   audio flows"
+      ]
+    },
+    {
+      "name": "relay over TLS with an untrusted certificate is refused",
+      "topo": {
+        "natA": "tcp443-only",
+        "natB": "cone"
+      },
+      "ok": true,
+      "ms": 2358,
+      "checks": [
+        "ok   relay-only invitation is not produced",
+        "ok   user sees \"relay server couldn’t be reached\" (Chromium validates the TLS certificate)"
+      ]
+    },
+    {
+      "name": "relay-only mode hides both addresses",
+      "topo": {
+        "natA": "cone",
+        "natB": "cone"
+      },
+      "ok": true,
+      "ms": 5791,
+      "checks": [
+        "ok   invitation contains only relay addresses (relay:udp:192.0.2.10)",
+        "ok   neither A's private nor public address appears in the invitation",
+        "ok   public STUN servers are not contacted in relay-only mode (turn:192.0.2.10:3478?transport=udp)",
+        "ok   B never learns A's addresses (B saw: 192.0.2.10)",
+        "ok   B only sees the relay address for A"
+      ]
+    },
+    {
+      "name": "public STUN unreachable (helper servers blocked), no relay",
+      "topo": {
+        "natA": "cone",
+        "natB": "cone"
+      },
+      "ok": true,
+      "ms": 78550,
+      "checks": [
+        "ok   invitation still produced, after 15.1 s (minimum wait, then quiet period)",
+        "ok   preview shown while waiting",
+        "ok   no public address could be learned",
+        "ok   diagnostics: What your computer found: local network address. The public helper servers couldn’t be reached from your network."
+      ]
+    },
+    {
+      "name": "UDP blocked, relay configured: gathering waits for the relay, not the dead STUN",
+      "topo": {
+        "natA": "udp-blocked",
+        "natB": "cone"
+      },
+      "ok": true,
+      "ms": 17100,
+      "checks": [
+        "ok   relay candidate included (host:udp:192.168.1.10, relay:udp:192.0.2.10, host:tcp:192.168.1.10)",
+        "ok   finished in 15.1 s, not held to the 30 s cap by the relay transport that can never answer (UDP)"
+      ]
+    },
+    {
+      "name": "connection blip of 8 s recovers; outage of 40 s ends the call",
+      "topo": {
+        "natA": "cone",
+        "natB": "cone"
+      },
+      "ok": true,
+      "ms": 32125,
+      "checks": [
+        "ok   A shows \"Connection unstable. Trying to recover…\"",
+        "ok   after the network returns, the banner clears",
+        "ok   and audio flows again without a new exchange",
+        "ok   a long outage ends with \"Connection lost\" after 17 s"
+      ]
+    },
+    {
+      "name": "slow exchange through home NATs: reply added after 90 s",
+      "topo": {
+        "natA": "cone",
+        "natB": "cone"
+      },
+      "ok": true,
+      "ms": 94032,
+      "checks": [
+        "ok   connected after a 90 s gap (router UDP conntrack timeouts: 30/120 s)"
+      ]
+    },
+    {
+      "name": "slow exchange through home NATs: reply added after 200 s",
+      "topo": {
+        "natA": "cone",
+        "natB": "cone"
+      },
+      "ok": true,
+      "ms": 204134,
+      "checks": [
+        "ok   connected after a 200 s gap (router UDP conntrack timeouts: 30/120 s)"
+      ]
+    }
+  ]
+}

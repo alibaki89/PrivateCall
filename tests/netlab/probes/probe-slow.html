@@ -1,0 +1,36 @@
+<!doctype html><meta charset="utf-8"><title>slow</title><script>
+window.log = [];
+const gather = (pc) => new Promise(r => { if (pc.iceGatheringState==='complete') r(); pc.onicegatheringstatechange=()=>pc.iceGatheringState==='complete'&&r(); setTimeout(r, 8000); });
+const ICE = { iceServers: [{ urls: ['stun:192.0.2.10:3478'] }] };
+window.mkOffer = async () => {
+  window.pc = new RTCPeerConnection(ICE); pc.createDataChannel('c',{negotiated:true,id:0});
+  pc.onconnectionstatechange = () => log.push([Date.now(), pc.connectionState]);
+  await pc.setLocalDescription(); await gather(pc); return pc.localDescription.sdp;
+};
+window.mkAnswer = async (sdp, mode) => {
+  window.pc = new RTCPeerConnection(ICE); pc.createDataChannel('c',{negotiated:true,id:0});
+  pc.onconnectionstatechange = () => log.push([Date.now(), pc.connectionState]);
+  pc.oniceconnectionstatechange = () => log.push([Date.now(), 'ice:' + pc.iceConnectionState]);
+  const lines = sdp.split('\r\n');
+  const cands = lines.filter(l => l.startsWith('a=candidate:')).map(l => l.slice(2));
+  const stripped = mode === 'plain' ? sdp : lines.filter(l => !l.startsWith('a=candidate:') && l !== 'a=end-of-candidates').join('\r\n');
+  await pc.setRemoteDescription({ type: 'offer', sdp: stripped });
+  await pc.setLocalDescription(); await gather(pc);
+  if (mode === 'readd') {
+    let round = 0;
+    const add = async () => {
+      round++;
+      for (const c of cands) {
+        const fresh = c.replace(/^candidate:(\S+)/, (m, f) => 'candidate:' + f + 'r' + round);
+        try { await pc.addIceCandidate({ candidate: fresh, sdpMid: '0' }); } catch (e) { log.push([Date.now(), 'adderr ' + e.message]); }
+      }
+    };
+    await add();
+    window.timer = setInterval(() => { if (pc.connectionState !== 'connected') add(); else clearInterval(timer); }, 15000);
+  } else if (mode === 'once') {
+    for (const c of cands) await pc.addIceCandidate({ candidate: c, sdpMid: '0' });
+  }
+  return pc.localDescription.sdp;
+};
+window.apply = (sdp) => pc.setRemoteDescription({ type: 'answer', sdp });
+</script>

@@ -1,0 +1,3618 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rG1AYkaUkb3pnpCwHQySDBaQBPCYJA6sV5OM69Pp8gg='; style-src 'sha256-rw1tJP80fMq7oteIQdd2ta44VD38m3/1+R+Yd3twn8U='; img-src data:; media-src 'none'; connect-src 'none'; font-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="generator" content="PrivateCall 1.2.0">
+<title>PrivateCall</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23444'/%3E%3C/svg%3E">
+<style>
+/* PrivateCall — plain, conventional desktop-utility styling.
+   System font, neutral colours, ordinary buttons, no decoration.
+   Logical properties (inline-start/end) so right-to-left needs no changes. */
+
+:root {
+  --bg: #ffffff;
+  --text: #202124;
+  --muted: #5f6368;
+  --border: #c4c7cc;
+  --panel: #f3f4f5;
+  --primary: #1f5ea8;
+  --primary-hover: #184c88;
+  --danger: #b3261e;
+  --ok: #1e7b34;
+  --warn: #8a5a00;
+  --focus: #1f5ea8;
+  --call-bg: #1f2124;
+  --call-panel: #2c2f33;
+  --call-text: #e8eaed;
+  --call-muted: #b4b8bd;
+  --radius: 4px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, Tahoma, sans-serif;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--font); }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+h1[tabindex="-1"]:focus { outline: none; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: 1.5rem; font-weight: 600; }
+h2 { font-size: 1.0625rem; font-weight: 600; }
+h3 { font-size: 0.9375rem; font-weight: 600; }
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.noscript { max-width: 36rem; margin: 3rem auto; padding: 0 1rem; }
+.muted { color: var(--muted); }
+
+/* ---------- frame ---------- */
+.app { min-height: 100%; display: flex; flex-direction: column; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.6rem 1.25rem; border-block-end: 1px solid var(--border); }
+.app-name { font-weight: 600; }
+.topbar-actions { display: flex; gap: 1.25rem; }
+main { flex: 1; display: flex; flex-direction: column; }
+.screen { flex: 1; display: flex; flex-direction: column; }
+.page { width: 100%; max-width: 40rem; margin: 0 auto; padding: 2rem 1.25rem 3rem; display: grid; gap: 1rem; align-content: start; }
+.page h2 { margin-top: 0.75rem; }
+.lead { color: var(--muted); }
+.plain-list { margin: 0; padding-inline-start: 1.4rem; display: grid; gap: 0.35rem; }
+
+/* ---------- controls ---------- */
+button { font: inherit; color: inherit; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  min-height: 2.25rem; padding: 0.35rem 0.9rem;
+  border: 1px solid var(--border); border-radius: var(--radius); background: #fff; cursor: pointer;
+}
+.btn:hover { background: var(--panel); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-large { min-height: 2.75rem; padding-inline: 1.4rem; }
+.btn-small { min-height: 1.9rem; padding: 0.2rem 0.7rem; font-size: 0.875rem; }
+.btn[aria-pressed="true"] { background: #e3ebf6; border-color: var(--primary); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.link { background: none; border: none; padding: 0; color: var(--primary); text-decoration: underline; cursor: pointer; }
+.link:hover { color: var(--primary-hover); }
+.back { justify-self: start; text-decoration: none; }
+.back::before { content: "‹ "; }
+
+.notice { padding: 0.6rem 0.8rem; border: 1px solid; border-radius: var(--radius); }
+.notice-danger { border-color: #e2a39f; background: #fdf0ef; color: #7a1712; }
+.notice-warn { border-color: #e6c88a; background: #fdf7e8; color: #5c3d00; }
+.notice-ok { border-color: #9ccaa8; background: #eef7f0; color: #15562a; }
+.field-error { color: var(--danger); }
+.working { color: var(--muted); }
+
+.message-text {
+  width: 100%; min-height: 4.5rem; resize: vertical; padding: 0.5rem 0.6rem;
+  font: 0.8125rem/1.4 ui-monospace, Consolas, "Liberation Mono", monospace; color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius); background: #fff; word-break: break-all;
+}
+.message-text[readonly] { background: var(--panel); }
+.dropzone { display: grid; gap: 0.5rem; }
+.dropzone.is-over .message-text { border: 2px dashed var(--primary); }
+
+/* ---------- setup screens ---------- */
+.setup { width: 100%; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; display: grid; gap: 2rem; align-items: start; }
+@media (min-width: 860px) { .setup:has(.setup-side:not([hidden])) { grid-template-columns: minmax(0, 1fr) 17rem; } }
+.setup-main { display: grid; gap: 1rem; max-width: 38rem; }
+.setup-head { display: grid; gap: 0.4rem; }
+#start-type { display: grid; gap: 0.75rem; }
+.steps { margin: 0; padding-inline-start: 1.4rem; display: grid; gap: 1.5rem; }
+.steps > li::marker { font-weight: 600; }
+.step-hint { color: var(--muted); margin-top: 0.15rem; }
+.step-body { margin-top: 0.6rem; display: grid; gap: 0.6rem; }
+.step.is-pending { color: var(--muted); }
+.step-note { color: var(--muted); font-size: 0.875rem; }
+.invite-summary { display: grid; gap: 0.6rem; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); }
+
+.preview { display: grid; gap: 0.6rem; }
+.preview-box { position: relative; aspect-ratio: 4 / 3; background: #2a2c2f; border-radius: var(--radius); overflow: hidden; }
+.preview-video, .self-video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+.preview-off { position: absolute; inset: 0; display: grid; place-items: center; color: #c4c7cc; font-size: 0.875rem; }
+.preview-row { display: grid; gap: 0.25rem; font-size: 0.875rem; }
+.meter { display: block; height: 6px; background: var(--panel); border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
+.meter-fill { display: block; height: 100%; width: 100%; background: var(--ok); transform-origin: left center; transform: scaleX(0); }
+[dir="rtl"] .meter-fill { transform-origin: right center; }
+
+/* ---------- call ---------- */
+.screen-call { background: var(--call-bg); color: var(--call-text); min-height: 100vh; }
+.app:has(#screen-call:not([hidden])) .topbar { display: none; }
+.call-bar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.5rem 1rem; background: var(--call-panel); font-size: 0.875rem; }
+.status { background: none; border: none; padding: 0; color: #f0c674; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.status.is-verified { color: #8fd19e; text-decoration: none; }
+.call-info { display: flex; gap: 1rem; color: var(--call-muted); font-variant-numeric: tabular-nums; }
+.stage { position: relative; flex: 1; min-height: 20rem; overflow: hidden; }
+.remote-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: var(--call-bg); }
+.stage-text { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 2rem; color: var(--call-muted); }
+.call-banner { position: absolute; top: 0.75rem; left: 50%; transform: translateX(-50%); z-index: 4; padding: 0.4rem 0.8rem; border-radius: var(--radius); background: #3c4043; color: #fff; max-width: calc(100% - 2rem); }
+.btn.call-banner { top: 3.25rem; border-color: #5f6368; }
+
+.verify {
+  position: absolute; z-index: 5; inset-inline: 0; top: 1rem; margin: 0 auto; width: min(32rem, calc(100% - 2rem));
+  max-height: calc(100% - 2rem); overflow-y: auto; display: grid; gap: 0.75rem;
+  padding: 1rem 1.25rem; background: #fff; color: var(--text); border-radius: var(--radius); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+.verify-code { display: flex; gap: 0.75rem; font-size: 2rem; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.05em; direction: ltr; }
+.verify-code.is-waiting { font-size: 1rem; font-weight: 400; letter-spacing: 0; color: var(--muted); }
+.verify-steps { margin: 0; padding-inline-start: 1.3rem; display: grid; gap: 0.25rem; }
+.verify-steps strong { font-variant-numeric: tabular-nums; }
+.note { font-size: 0.875rem; color: var(--muted); }
+.note-ok { color: var(--ok); }
+
+.self-view { position: absolute; inset-inline-end: 1rem; bottom: 1rem; z-index: 3; width: clamp(8rem, 18vw, 13rem); aspect-ratio: 4 / 3; background: #2a2c2f; border: 1px solid #44474b; border-radius: var(--radius); overflow: hidden; }
+.self-off { position: absolute; inset: 0; display: grid; place-items: center; color: var(--call-muted); font-size: 0.8125rem; }
+.self-label { position: absolute; inset-inline-start: 0; bottom: 0; padding: 0.1rem 0.4rem; background: rgba(0, 0, 0, 0.65); color: #fff; font-size: 0.75rem; }
+.self-label-end { inset-inline-start: auto; inset-inline-end: 0; }
+#self-badge { bottom: auto; top: 0; }
+
+.controls { display: flex; justify-content: center; gap: 0.5rem; padding: 0.75rem 1rem; background: var(--call-panel); }
+.ctl { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 2.5rem; padding: 0.35rem 1rem; border: 1px solid #5f6368; border-radius: var(--radius); background: #3c4043; color: #fff; cursor: pointer; }
+.ctl:hover { background: #4a4e52; }
+.ctl[aria-pressed="false"] { background: #e8eaed; color: var(--text); border-color: #e8eaed; }
+.ctl-leave { background: var(--danger); border-color: var(--danger); }
+.ctl-leave:hover { background: #8f1e18; }
+.ic { width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- ended ---------- */
+#ended-card.is-danger #ended-title { color: var(--danger); }
+#ended-card.is-danger .ended-body { padding: 0.6rem 0.8rem; border: 1px solid #e2a39f; background: #fdf0ef; border-radius: var(--radius); color: #7a1712; }
+.ended-tips { display: grid; gap: 0.4rem; }
+.ended-tips ul { margin: 0; padding-inline-start: 1.3rem; }
+.ended-diag { color: var(--muted); font-size: 0.875rem; }
+.ended-duration { color: var(--muted); }
+
+/* ---------- dialogs ---------- */
+.dialog { width: min(32rem, calc(100% - 2rem)); max-height: calc(100% - 2rem); padding: 0; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); }
+.dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
+.dialog-inner { padding: 1.25rem; display: grid; gap: 0.75rem; }
+.dialog-lead, .dialog-hint { color: var(--muted); font-size: 0.875rem; }
+.dialog-actions { justify-content: flex-end; }
+.prose ul { margin: 0; padding-inline-start: 1.3rem; display: grid; gap: 0.3rem; }
+.build-id { font-size: 0.8125rem; color: var(--muted); }
+.check { display: grid; grid-template-columns: auto 1fr; gap: 0.6rem; align-items: start; }
+.check input { margin-top: 0.3rem; }
+.check-label { display: block; }
+.check-hint { display: block; color: var(--muted); font-size: 0.8125rem; }
+.check:has(input:disabled) { opacity: 0.55; }
+.details { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1rem; margin: 0; font-size: 0.875rem; }
+.details dt { color: var(--muted); }
+.details dd { margin: 0; overflow-wrap: anywhere; }
+.details dd.mono { font: 0.75rem/1.4 ui-monospace, Consolas, monospace; }
+
+.toast { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); z-index: 50; max-width: min(30rem, calc(100% - 2rem)); padding: 0.6rem 0.9rem; border-radius: var(--radius); background: #202124; color: #fff; }
+.app:has(#screen-call:not([hidden])) ~ .toast { bottom: 4.5rem; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+@media (max-width: 560px) { .self-view { width: 7rem; } }
+</style>
+</head>
+<body>
+<noscript><p class="noscript">PrivateCall needs JavaScript to run. Open this file in a current version of Chrome, Edge or Firefox.</p></noscript>
+
+<svg width="0" height="0" class="sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></symbol>
+    <symbol id="i-mic-off" viewBox="0 0 24 24"><path d="M15 9.5V6a3 3 0 0 0-5.7-1.3M9 9v2a3 3 0 0 0 5 2.2M5.5 11a6.5 6.5 0 0 0 10.7 5M18.3 13a6.4 6.4 0 0 0 .2-2M12 17.5V21M4 4l16 16"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24"><rect x="3" y="6.5" width="12.5" height="11" rx="2"/><path d="M15.5 10.5 21 7.5v9l-5.5-3"/></symbol>
+    <symbol id="i-cam-off" viewBox="0 0 24 24"><path d="M8 6.5h5a2.5 2.5 0 0 1 2.5 2.5v3.5M15.5 15v.5A2 2 0 0 1 13.5 17.5H5.5A2.5 2.5 0 0 1 3 15V9a2.5 2.5 0 0 1 1.5-2.3M15.5 10.5 21 7.5v9l-3-1.6M4 4l16 16"/></symbol>
+  </defs>
+</svg>
+
+<div class="app" id="app">
+  <header class="topbar" id="topbar">
+    <span class="app-name" data-i18n="app.name"></span>
+    <nav class="topbar-actions">
+      <button type="button" class="link" id="btn-about" data-i18n="top.about"></button>
+      <button type="button" class="link" id="btn-settings" data-i18n="top.settings"></button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- Welcome -->
+    <section class="screen screen-welcome" id="screen-welcome" aria-labelledby="welcome-title" hidden>
+      <div class="page">
+        <h1 id="welcome-title" data-i18n="welcome.title"></h1>
+        <p class="lead" data-i18n="welcome.lead"></p>
+        <p class="notice notice-danger" id="unsupported" role="alert" hidden data-i18n="welcome.unsupported"></p>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary btn-large" id="btn-start" data-i18n="welcome.start"></button>
+          <button type="button" class="btn btn-large" id="btn-join" data-i18n="welcome.join"></button>
+        </div>
+        <h2 data-i18n="welcome.howTitle"></h2>
+        <ol class="plain-list">
+          <li data-i18n="welcome.how1"></li>
+          <li data-i18n="welcome.how2"></li>
+          <li data-i18n="welcome.how3"></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Start a call -->
+    <section class="screen screen-setup" id="screen-start" aria-labelledby="start-title" hidden>
+      <div class="setup">
+        <div class="setup-main">
+          <div class="setup-head">
+            <button type="button" class="link back" id="start-back" data-i18n="common.back"></button>
+            <h1 id="start-title" class="setup-title" tabindex="-1" data-i18n="start.title"></h1>
+          </div>
+
+          <div id="start-type">
+            <p class="notice notice-danger" id="start-media-error" role="alert" hidden></p>
+            <p data-i18n="start.typeQuestion"></p>
+            <div class="btn-row">
+              <button type="button" class="btn btn-primary" id="btn-start-video" data-i18n="start.video"></button>
+              <button type="button" class="btn" id="btn-start-audio" data-i18n="start.audio"></button>
+            </div>
+          </div>
+
+          <ol class="steps" id="start-steps" hidden>
+            <li class="step" id="start-step1">
+              <h2 class="step-title" data-i18n="start.step1"></h2>
+              <p class="step-hint" data-i18n="start.step1Hint"></p>
+              <div class="step-body">
+                <p class="working" id="start-working" role="status"><span id="start-working-text"></span></p>
+                <p class="notice notice-danger" id="start-error" role="alert" hidden></p>
+                <div class="message-out" id="invite-out" hidden>
+                  <textarea dir="ltr" class="message-text" id="invite-text" readonly rows="4" spellcheck="false" aria-labelledby="start-step1-label"></textarea>
+                  <span id="start-step1-label" class="sr-only" data-i18n="start.step1"></span>
+                  <div class="btn-row">
+                    <button type="button" class="btn btn-primary" id="invite-copy"><span data-i18n="common.copy"></span></button>
+                    <button type="button" class="btn" id="invite-save"><span data-i18n="common.save"></span></button>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="step" id="start-step2">
+              <h2 class="step-title" data-i18n="start.step2"></h2>
+              <p class="step-hint" data-i18n="start.step2Hint"></p>
+              <div class="step-body" id="reply-in-wrap" hidden>
+                <div class="dropzone" id="reply-drop">
+                  <textarea dir="ltr" class="message-text" id="reply-text" rows="3" spellcheck="false" data-i18n-placeholder="start.replyPlaceholder" data-i18n-aria="start.step2"></textarea>
+                  <div class="btn-row">
+                    <button type="button" class="btn" id="reply-paste"><span data-i18n="common.paste"></span></button>
+                    <button type="button" class="btn" id="reply-file"><span data-i18n="common.openFile"></span></button>
+                  </div>
+                </div>
+                <p class="field-error" id="reply-error" role="alert" hidden></p>
+                <p class="step-note" data-i18n="start.waitingReply"></p>
+              </div>
+            </li>
+            <li class="step" id="start-step3">
+              <h2 class="step-title" data-i18n="start.step3"></h2>
+              <p class="step-hint" data-i18n="start.step3Hint"></p>
+            </li>
+          </ol>
+          <div class="setup-foot" id="start-foot" hidden>
+            <button type="button" class="btn" id="start-cancel" data-i18n="common.cancel"></button>
+          </div>
+        </div>
+        <aside class="setup-side" id="start-side" hidden></aside>
+      </div>
+    </section>
+
+    <!-- Join a call -->
+    <section class="screen screen-setup" id="screen-join" aria-labelledby="join-title" hidden>
+      <div class="setup">
+        <div class="setup-main">
+          <div class="setup-head">
+            <button type="button" class="link back" id="join-back" data-i18n="common.back"></button>
+            <h1 id="join-title" class="setup-title" tabindex="-1" data-i18n="join.title"></h1>
+          </div>
+          <ol class="steps">
+            <li class="step" id="join-step1">
+              <h2 class="step-title" data-i18n="join.step1"></h2>
+              <p class="step-hint" data-i18n="join.step1Hint"></p>
+              <div class="step-body">
+                <div class="dropzone" id="invite-drop">
+                  <textarea dir="ltr" class="message-text" id="invite-in" rows="3" spellcheck="false" data-i18n-placeholder="join.invitePlaceholder" data-i18n-aria="join.step1"></textarea>
+                  <div class="btn-row">
+                    <button type="button" class="btn" id="invite-paste"><span data-i18n="common.paste"></span></button>
+                    <button type="button" class="btn" id="invite-file"><span data-i18n="common.openFile"></span></button>
+                  </div>
+                </div>
+                <p class="field-error" id="invite-error" role="alert" hidden></p>
+                <div class="invite-summary" id="invite-summary" hidden>
+                  <p><strong id="invite-kind"></strong> <span class="muted" id="invite-age"></span></p>
+                  <p class="notice notice-warn" id="invite-warn" hidden></p>
+                  <div class="btn-row" id="join-actions">
+                    <button type="button" class="btn btn-primary" id="join-cam"><span data-i18n="join.withCamera"></span></button>
+                    <button type="button" class="btn" id="join-mic"><span id="join-mic-label" data-i18n="join.withMic"></span></button>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="step" id="join-step2">
+              <h2 class="step-title" data-i18n="join.step2"></h2>
+              <p class="step-hint" data-i18n="join.step2Hint"></p>
+              <div class="step-body" id="join-step2-body" hidden>
+                <p class="working" id="join-working" role="status"><span id="join-working-text"></span></p>
+                <p class="notice notice-danger" id="join-error" role="alert" hidden></p>
+                <div class="message-out" id="reply-out" hidden>
+                  <textarea dir="ltr" class="message-text" id="reply-out-text" readonly rows="4" spellcheck="false" data-i18n-aria="join.step2"></textarea>
+                  <div class="btn-row">
+                    <button type="button" class="btn btn-primary" id="reply-copy"><span data-i18n="common.copy"></span></button>
+                    <button type="button" class="btn" id="reply-save"><span data-i18n="common.save"></span></button>
+                  </div>
+                  <p class="working" id="join-waiting" role="status"><span id="join-waiting-text" data-i18n="join.waiting"></span></p>
+                </div>
+              </div>
+            </li>
+            <li class="step" id="join-step3">
+              <h2 class="step-title" data-i18n="join.step3"></h2>
+              <p class="step-hint" data-i18n="start.step3Hint"></p>
+            </li>
+          </ol>
+          <div class="setup-foot" id="join-foot" hidden>
+            <button type="button" class="btn" id="join-cancel" data-i18n="common.cancel"></button>
+          </div>
+        </div>
+        <aside class="setup-side" id="join-side" hidden></aside>
+      </div>
+    </section>
+
+    <!-- In call -->
+    <section class="screen screen-call" id="screen-call" aria-labelledby="call-title" hidden>
+      <h1 class="sr-only" id="call-title" tabindex="-1" data-i18n="app.name"></h1>
+      <div class="call-bar">
+        <button type="button" class="status" id="sec-chip" aria-describedby="sec-tip"><span id="sec-chip-text"></span></button>
+        <span class="sr-only" id="sec-tip" data-i18n="call.statusTip"></span>
+        <span class="call-info"><span id="quality"></span><span id="call-timer"></span></span>
+      </div>
+      <div class="stage" id="stage">
+        <video class="remote-video" id="remote-video" autoplay playsinline muted></video>
+        <audio id="remote-audio" autoplay></audio>
+        <p class="stage-text" id="remote-placeholder"><span id="remote-placeholder-text"></span></p>
+        <p class="stage-text" id="call-connecting" role="status"><span data-i18n="call.connecting"></span></p>
+        <p class="call-banner" id="call-banner" role="status" hidden></p>
+        <button type="button" class="btn call-banner" id="btn-enable-sound" hidden data-i18n="call.enableSound"></button>
+
+        <div class="verify" id="verify" role="region" aria-labelledby="verify-title" hidden>
+          <h2 id="verify-title" data-i18n="call.verifyTitle"></h2>
+          <p class="verify-code" id="verify-code"></p>
+          <ol class="verify-steps" id="verify-body">
+            <li id="verify-step-say"></li>
+            <li id="verify-step-hear"></li>
+            <li data-i18n="call.stepConfirm"></li>
+          </ol>
+          <div class="btn-row" id="verify-speak">
+            <button type="button" class="btn" id="btn-speak" aria-pressed="false"><span id="btn-speak-label" data-i18n="call.speak"></span></button>
+            <span class="muted" id="verify-remote-mic"></span>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary" id="btn-match" data-i18n="call.match"></button>
+            <button type="button" class="btn" id="btn-nomatch" data-i18n="call.noMatch"></button>
+            <button type="button" class="link" id="btn-later" data-i18n="call.later"></button>
+          </div>
+          <p class="note" id="verify-private" data-i18n="call.privateUntilConfirm"></p>
+          <p class="note note-ok" id="verify-remote" data-i18n="call.remoteConfirmed" hidden></p>
+          <p class="note" id="verify-strong"><span data-i18n="call.strongShort"></span> <button type="button" class="link" id="btn-copy-code" data-i18n="call.copyCode"></button></p>
+          <p class="note"><button type="button" class="link" id="btn-talk-unverified" data-i18n="call.talkUnverified"></button></p>
+        </div>
+
+        <div class="self-view" id="self-view">
+          <video class="self-video" id="self-video" autoplay playsinline muted></video>
+          <span class="self-off" id="self-off" data-i18n="preview.cameraOff"></span>
+          <span class="self-label" id="self-badge" hidden data-i18n="call.youNotShared"></span>
+          <span class="self-label self-label-end" id="self-muted" hidden data-i18n="call.micNotSent"></span>
+        </div>
+      </div>
+      <div class="controls" role="toolbar" data-i18n-aria="call.controls" id="controls">
+        <button type="button" class="ctl" id="ctl-mic" aria-pressed="true" aria-keyshortcuts="M"><svg class="ic" aria-hidden="true"><use id="ctl-mic-icon" href="#i-mic"/></svg><span data-i18n="call.micLabel"></span></button>
+        <button type="button" class="ctl" id="ctl-cam" aria-pressed="true" aria-keyshortcuts="V"><svg class="ic" aria-hidden="true"><use id="ctl-cam-icon" href="#i-cam"/></svg><span data-i18n="call.camLabel"></span></button>
+        <button type="button" class="ctl" id="ctl-details" data-i18n="call.details"></button>
+        <button type="button" class="ctl ctl-leave" id="ctl-hangup" data-i18n="call.hangup"></button>
+      </div>
+    </section>
+
+    <!-- Ended / failed -->
+    <section class="screen screen-ended" id="screen-ended" aria-labelledby="ended-title" hidden>
+      <div class="page" id="ended-card">
+        <h1 class="ended-title" id="ended-title" tabindex="-1"></h1>
+        <p class="ended-body" id="ended-body"></p>
+        <p class="ended-duration" id="ended-duration" hidden></p>
+        <div class="ended-tips" id="ended-tips" hidden>
+          <h2 data-i18n="ended.tipsTitle"></h2>
+          <ul>
+            <li data-i18n="ended.tip1"></li>
+            <li data-i18n="ended.tip2"></li>
+            <li data-i18n="ended.tip3"></li>
+          </ul>
+          <p class="ended-diag" id="ended-diag"></p>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary" id="ended-again"></button>
+          <button type="button" class="btn" id="ended-home" data-i18n="ended.home"></button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Preview tile template, moved into the active setup screen -->
+<div class="preview" id="preview" hidden>
+  <div class="preview-box">
+    <video class="preview-video" id="preview-video" autoplay playsinline muted></video>
+    <span class="preview-off" id="preview-off" data-i18n="preview.noCamera"></span>
+  </div>
+  <div class="preview-row">
+    <span class="muted" data-i18n="preview.micCheck"></span>
+    <span class="meter" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-aria="preview.micCheck"><span class="meter-fill" id="meter-fill"></span></span>
+  </div>
+  <button type="button" class="btn btn-small" id="preview-cam"><span id="preview-cam-label"></span></button>
+  <p class="muted" id="preview-notice" hidden></p>
+</div>
+
+<dialog class="dialog" id="dlg-settings" aria-labelledby="settings-title">
+  <form method="dialog" class="dialog-inner" id="settings-form">
+    <h2 id="settings-title" data-i18n="settings.title"></h2>
+    <p class="dialog-lead" data-i18n="settings.intro"></p>
+    <label class="check">
+      <input type="checkbox" id="set-stun" checked>
+      <span><span class="check-label" data-i18n="settings.stun"></span><span class="check-hint" data-i18n="settings.stunHint"></span></span>
+    </label>
+    <h3 data-i18n="settings.relayTitle"></h3>
+    <p class="dialog-hint" data-i18n="settings.relayHint"></p>
+    <div id="relay-entry">
+      <textarea dir="ltr" class="message-text" id="set-relay" rows="2" spellcheck="false" data-i18n-placeholder="settings.relayPlaceholder" data-i18n-aria="settings.relayTitle"></textarea>
+      <div class="btn-row"><button type="button" class="btn" id="set-relay-add" data-i18n="settings.relayAdd"></button></div>
+    </div>
+    <p class="field-error" id="relay-error" role="alert" hidden></p>
+    <div id="relay-active" hidden>
+      <p class="notice notice-ok" id="relay-active-text"></p>
+      <div class="btn-row"><button type="button" class="btn" id="set-relay-remove" data-i18n="settings.relayRemove"></button></div>
+    </div>
+    <label class="check" id="relay-only-wrap">
+      <input type="checkbox" id="set-relay-only" disabled>
+      <span><span class="check-label" data-i18n="settings.relayOnly"></span><span class="check-hint" data-i18n="settings.relayOnlyHint"></span></span>
+    </label>
+    <p class="dialog-hint" id="settings-next" hidden data-i18n="settings.appliesNext"></p>
+    <div class="btn-row dialog-actions"><button class="btn btn-primary" value="done" data-i18n="settings.done"></button></div>
+  </form>
+</dialog>
+
+<dialog class="dialog" id="dlg-about" aria-labelledby="about-title">
+  <form method="dialog" class="dialog-inner prose">
+    <h2 id="about-title" data-i18n="about.title"></h2>
+    <p data-i18n="about.p1"></p>
+    <h3 data-i18n="about.h2"></h3>
+    <p data-i18n="about.p2"></p>
+    <h3 data-i18n="about.h3"></h3>
+    <ul>
+      <li data-i18n="about.li1"></li>
+      <li data-i18n="about.li2"></li>
+      <li data-i18n="about.li3"></li>
+      <li data-i18n="about.li4"></li>
+    </ul>
+    <h3 data-i18n="about.h4"></h3>
+    <p data-i18n="about.p4"></p>
+    <p class="build-id">PrivateCall 1.2.0</p>
+    <div class="btn-row dialog-actions"><button class="btn btn-primary" value="close" data-i18n="common.close"></button></div>
+  </form>
+</dialog>
+
+<dialog class="dialog" id="dlg-details" aria-labelledby="details-title">
+  <form method="dialog" class="dialog-inner">
+    <h2 id="details-title" data-i18n="details.title"></h2>
+    <dl class="details" id="details-list"></dl>
+    <p class="dialog-hint" data-i18n="details.pathNote"></p>
+    <p class="dialog-hint" id="details-latency"></p>
+    <div class="btn-row dialog-actions"><button class="btn btn-primary" value="close" data-i18n="common.close"></button></div>
+  </form>
+</dialog>
+
+<dialog class="dialog" id="dlg-talk" aria-labelledby="talk-title">
+  <form method="dialog" class="dialog-inner">
+    <h2 id="talk-title" data-i18n="call.talkConfirmTitle"></h2>
+    <p data-i18n="call.talkConfirmBody"></p>
+    <div class="btn-row dialog-actions">
+      <button class="btn btn-primary" value="no" data-i18n="call.camConfirmNo"></button>
+      <button class="btn" value="yes" data-i18n="call.talkConfirmYes"></button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dialog" id="dlg-cam" aria-labelledby="cam-title">
+  <form method="dialog" class="dialog-inner">
+    <h2 id="cam-title" data-i18n="call.camConfirmTitle"></h2>
+    <p data-i18n="call.camConfirmBody"></p>
+    <div class="btn-row dialog-actions">
+      <button class="btn btn-primary" value="no" data-i18n="call.camConfirmNo"></button>
+      <button class="btn" value="yes" data-i18n="call.camConfirmYes"></button>
+    </div>
+  </form>
+</dialog>
+
+<input type="file" id="file-input" accept=".txt,text/plain" hidden>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(() => {
+'use strict';
+// ---- util.js ----
+// Small, dependency-free helpers shared by the core modules.
+// Everything here works both in browsers and in Node >= 20 (used by unit tests).
+
+const textEncoder = new TextEncoder();
+const textDecoderStrict = new TextDecoder('utf-8', { fatal: true });
+
+function utf8Encode(str) {
+  return textEncoder.encode(str);
+}
+
+function utf8Decode(bytes) {
+  return textDecoderStrict.decode(bytes);
+}
+
+function randomBytes(n) {
+  const out = new Uint8Array(n);
+  crypto.getRandomValues(out);
+  return out;
+}
+
+async function sha256(bytes) {
+  return new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+}
+
+function concatBytes(...parts) {
+  let len = 0;
+  for (const p of parts) len += p.length;
+  const out = new Uint8Array(len);
+  let off = 0;
+  for (const p of parts) {
+    out.set(p, off);
+    off += p.length;
+  }
+  return out;
+}
+
+// Unambiguous encoding of a list of byte strings: 4-byte big-endian length + bytes.
+// Used for every hash input so that field boundaries cannot be shifted.
+function lengthPrefixed(fields) {
+  const parts = [];
+  for (const f of fields) {
+    const bytes = typeof f === 'string' ? utf8Encode(f) : f;
+    const len = new Uint8Array(4);
+    new DataView(len.buffer).setUint32(0, bytes.length, false);
+    parts.push(len, bytes);
+  }
+  return concatBytes(...parts);
+}
+
+function bytesEqual(a, b) {
+  if (!(a instanceof Uint8Array) || !(b instanceof Uint8Array)) return false;
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+  return diff === 0;
+}
+
+const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+const B64URL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+
+function makeReverse(alphabet) {
+  const rev = new Int16Array(128).fill(-1);
+  for (let i = 0; i < alphabet.length; i++) rev[alphabet.charCodeAt(i)] = i;
+  return rev;
+}
+const B64_REV = makeReverse(B64);
+const B64URL_REV = makeReverse(B64URL);
+
+function encodeWith(bytes, alphabet) {
+  let out = '';
+  let i = 0;
+  for (; i + 2 < bytes.length; i += 3) {
+    const n = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
+    out += alphabet[(n >> 18) & 63] + alphabet[(n >> 12) & 63] + alphabet[(n >> 6) & 63] + alphabet[n & 63];
+  }
+  const rem = bytes.length - i;
+  if (rem === 1) {
+    const n = bytes[i] << 16;
+    out += alphabet[(n >> 18) & 63] + alphabet[(n >> 12) & 63];
+  } else if (rem === 2) {
+    const n = (bytes[i] << 16) | (bytes[i + 1] << 8);
+    out += alphabet[(n >> 18) & 63] + alphabet[(n >> 12) & 63] + alphabet[(n >> 6) & 63];
+  }
+  return out; // unpadded
+}
+
+// Strict decoder: rejects any character outside the alphabet, rejects impossible
+// lengths and non-zero trailing bits (so each byte string has one encoding).
+function decodeWith(str, rev) {
+  if (str.length % 4 === 1) return null;
+  const outLen = Math.floor((str.length * 3) / 4);
+  const out = new Uint8Array(outLen);
+  let o = 0;
+  let acc = 0;
+  let bits = 0;
+  for (let i = 0; i < str.length; i++) {
+    const c = str.charCodeAt(i);
+    const v = c < 128 ? rev[c] : -1;
+    if (v < 0) return null;
+    acc = (acc << 6) | v;
+    bits += 6;
+    if (bits >= 8) {
+      bits -= 8;
+      out[o++] = (acc >> bits) & 0xff;
+    }
+    acc &= (1 << bits) - 1;
+  }
+  if (acc !== 0) return null; // non-canonical trailing bits
+  return out;
+}
+
+function base64Encode(bytes) {
+  return encodeWith(bytes, B64);
+}
+function base64Decode(str) {
+  return decodeWith(str, B64_REV);
+}
+function base64urlEncode(bytes) {
+  return encodeWith(bytes, B64URL);
+}
+function base64urlDecode(str) {
+  return decodeWith(str, B64URL_REV);
+}
+
+function hexToBytes(hex) {
+  if (typeof hex !== 'string' || hex.length % 2 !== 0 || !/^[0-9a-fA-F]*$/.test(hex)) return null;
+  const out = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.substr(i * 2, 2), 16);
+  return out;
+}
+
+function wipe(bytes) {
+  if (bytes instanceof Uint8Array) bytes.fill(0);
+}
+
+// Deflate (raw) with a hard cap on the decompressed size, so a crafted payload
+// cannot expand into a large allocation ("zip bomb").
+async function deflateRaw(bytes) {
+  const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function inflateRawLimited(bytes, maxOut) {
+  const ds = new DecompressionStream('deflate-raw');
+  const writer = ds.writable.getWriter();
+  const reader = ds.readable.getReader();
+  // Errors surface on the reader; swallow the writer-side duplicates.
+  writer.write(bytes).catch(() => {});
+  writer.close().catch(() => {});
+  const chunks = [];
+  let total = 0;
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      total += value.length;
+      if (total > maxOut) {
+        reader.cancel().catch(() => {});
+        return { ok: false, reason: 'too-large' };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { ok: false, reason: 'corrupt' };
+  }
+  return { ok: true, bytes: concatBytes(...chunks) };
+}
+
+// ---- codec.js ----
+// Text "envelope" for invitations and replies.
+//
+// People move these through chat apps and email, which re-wrap lines, add
+// quote markers, or apply formatting. The envelope is designed to survive that:
+//   * standard base64 alphabet (A-Z a-z 0-9 + /): no "_", "*", "~", "`" that chat
+//     apps interpret as formatting;
+//   * whitespace, ">" quote markers and invisible characters are ignored;
+//   * a checksum detects truncation and accidental corruption.
+// The checksum is NOT a security mechanism (anyone can recompute it). Protection
+// against deliberate tampering comes from the security-code check (see sas.js).
+
+
+
+const PROTOCOL_VERSION = 1;
+const LIMITS = {
+  text: 40000, // characters accepted from paste / file
+  binary: 24000, // decoded envelope bytes
+  json: 32000, // decompressed JSON bytes
+  file: 64 * 1024, // bytes accepted from a dropped / opened file
+};
+
+const MAGIC = [0x50, 0x43]; // "PC"
+const KIND_CODES = { invite: 1, reply: 2 };
+const KIND_NAMES = { 1: 'invite', 2: 'reply' };
+const FLAG_DEFLATE = 1;
+const CHECKSUM_LEN = 8;
+const LINE = 64;
+
+const MARKER_RE = /PrivateCall[.](invite|reply)[.]v(\d{1,3}):/gi;
+const END_MARK = ':end';
+
+async function encodeEnvelope(kind, payloadObj, introText) {
+  const code = KIND_CODES[kind];
+  if (!code) throw new Error('bad kind');
+  const json = utf8Encode(JSON.stringify(payloadObj));
+  if (json.length > LIMITS.json) throw new Error('payload too large');
+  let body = json;
+  let flags = 0;
+  if (typeof CompressionStream === 'function') {
+    body = await deflateRaw(json);
+    flags |= FLAG_DEFLATE;
+  }
+  const head = new Uint8Array([...MAGIC, PROTOCOL_VERSION, code, flags]);
+  const unsummed = concatBytes(head, body);
+  const sum = (await sha256(unsummed)).slice(0, CHECKSUM_LEN);
+  const b64 = base64Encode(concatBytes(unsummed, sum));
+  const lines = [];
+  for (let i = 0; i < b64.length; i += LINE) lines.push(b64.slice(i, i + LINE));
+  const block = `PrivateCall.${kind}.v${PROTOCOL_VERSION}:\n${lines.join('\n')}\n${END_MARK}`;
+  return introText ? `${introText}\n\n${block}\n` : `${block}\n`;
+}
+
+// Returns { ok: true, kind, version, payload } or { ok: false, error }.
+// Error codes are mapped to friendly messages by the UI.
+async function decodeEnvelope(text) {
+  if (typeof text !== 'string' || text.trim() === '') return { ok: false, error: 'empty' };
+  if (text.length > LIMITS.text) return { ok: false, error: 'too-large' };
+
+  MARKER_RE.lastIndex = 0;
+  const matches = [...text.matchAll(MARKER_RE)];
+  if (matches.length === 0) {
+    if (/^\s*PCRELAY/i.test(text)) return { ok: false, error: 'is-relay-code' };
+    return { ok: false, error: 'not-found' };
+  }
+  if (matches.length > 1) return { ok: false, error: 'multiple' };
+  const m = matches[0];
+  const kind = m[1].toLowerCase();
+  const version = Number(m[2]);
+  const start = m.index + m[0].length;
+  const endIdx = text.toLowerCase().indexOf(END_MARK, start);
+  if (endIdx < 0) return { ok: false, error: 'incomplete', kind };
+  if (version !== PROTOCOL_VERSION) {
+    return { ok: false, error: version > PROTOCOL_VERSION ? 'version-newer' : 'version-older', kind };
+  }
+
+  // Ignore line breaks, spaces, quote markers and invisible formatting characters.
+  const raw = text
+    .slice(start, endIdx)
+    .replace(/[\s>\u200b-\u200f\u2028\u2029\u2060\ufeff]/g, '');
+  if (!/^[A-Za-z0-9+/]*$/.test(raw)) return { ok: false, error: 'corrupt', kind };
+  const bin = base64Decode(raw);
+  if (!bin) return { ok: false, error: 'corrupt', kind };
+  if (bin.length > LIMITS.binary) return { ok: false, error: 'too-large', kind };
+  if (bin.length < 5 + CHECKSUM_LEN) return { ok: false, error: 'incomplete', kind };
+
+  const unsummed = bin.subarray(0, bin.length - CHECKSUM_LEN);
+  const sum = bin.subarray(bin.length - CHECKSUM_LEN);
+  const expect = (await sha256(unsummed)).slice(0, CHECKSUM_LEN);
+  if (!bytesEqual(sum, expect)) return { ok: false, error: 'corrupt', kind };
+
+  if (bin[0] !== MAGIC[0] || bin[1] !== MAGIC[1]) return { ok: false, error: 'corrupt', kind };
+  if (bin[2] !== PROTOCOL_VERSION) return { ok: false, error: 'corrupt', kind };
+  if (KIND_NAMES[bin[3]] !== kind) return { ok: false, error: 'corrupt', kind };
+  const flags = bin[4];
+  if (flags & ~FLAG_DEFLATE) return { ok: false, error: 'corrupt', kind };
+
+  let jsonBytes = unsummed.subarray(5);
+  if (flags & FLAG_DEFLATE) {
+    if (typeof DecompressionStream !== 'function') return { ok: false, error: 'browser-unsupported', kind };
+    const r = await inflateRawLimited(jsonBytes, LIMITS.json);
+    if (!r.ok) return { ok: false, error: r.reason === 'too-large' ? 'too-large' : 'corrupt', kind };
+    jsonBytes = r.bytes;
+  } else if (jsonBytes.length > LIMITS.json) {
+    return { ok: false, error: 'too-large', kind };
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(utf8Decode(jsonBytes));
+  } catch {
+    return { ok: false, error: 'corrupt', kind };
+  }
+  return { ok: true, kind, version, payload };
+}
+
+// ---- sdp.js ----
+// Defensive inspection of SDP received from the other person.
+//
+// We never "munge" SDP. We only check that it is well-formed for what this app
+// generates, and extract the DTLS certificate fingerprint that the browser will
+// enforce during the DTLS handshake. That fingerprint is what the security code
+// (SAS) is computed over, so it must be unambiguous: exactly one fingerprint,
+// identical on every media section.
+
+const SDP_MAX_LENGTH = 20000;
+const FP_ALGS = { 'sha-256': 32, 'sha-384': 48, 'sha-512': 64 };
+
+function inspectSdp(sdp, type) {
+  const fail = (code) => ({ ok: false, error: code });
+  if (typeof sdp !== 'string') return fail('sdp-type');
+  if (sdp.length < 20 || sdp.length > SDP_MAX_LENGTH) return fail('sdp-size');
+  // Printable ASCII and CRLF only.
+  if (!/^[\x20-\x7e\r\n]*$/.test(sdp)) return fail('sdp-charset');
+  if (!sdp.startsWith('v=0\r\n')) return fail('sdp-start');
+  if (!sdp.endsWith('\r\n')) return fail('sdp-end');
+
+  const lines = sdp.slice(0, -2).split('\r\n');
+  const fingerprints = new Set();
+  const setups = new Set();
+  const kinds = [];
+  const candidates = [];
+  let ufrag = null;
+  let pwd = null;
+
+  for (const line of lines) {
+    if (!/^[a-z]=/.test(line)) return fail('sdp-line');
+    if (line.includes('\r') || line.includes('\n')) return fail('sdp-line');
+    if (line.startsWith('m=')) {
+      const m = /^m=(audio|video|application) \d+ [A-Z/]+( [\w-]+)+$/.exec(line);
+      if (!m) return fail('sdp-media');
+      kinds.push(m[1]);
+    } else if (line.startsWith('a=fingerprint:')) {
+      const m = /^a=fingerprint:(\S+) ([0-9A-Fa-f]{2}(?::[0-9A-Fa-f]{2})+)$/.exec(line);
+      if (!m) return fail('sdp-fingerprint');
+      const alg = m[1].toLowerCase();
+      const value = m[2].toUpperCase();
+      if (!(alg in FP_ALGS)) return fail('sdp-fingerprint-alg');
+      if (value.split(':').length !== FP_ALGS[alg]) return fail('sdp-fingerprint');
+      fingerprints.add(alg + ' ' + value);
+    } else if (line.startsWith('a=setup:')) {
+      setups.add(line.slice(8));
+    } else if (line.startsWith('a=ice-ufrag:')) {
+      const v = line.slice(12);
+      if (ufrag !== null && ufrag !== v) return fail('sdp-ice');
+      ufrag = v;
+    } else if (line.startsWith('a=ice-pwd:')) {
+      const v = line.slice(10);
+      if (pwd !== null && pwd !== v) return fail('sdp-ice');
+      pwd = v;
+    } else if (line.startsWith('a=candidate:')) {
+      const c = parseCandidate(line.slice(2));
+      if (c) candidates.push(c);
+    }
+  }
+
+  // This app always negotiates exactly one audio, one video and one data section.
+  const sorted = [...kinds].sort().join(',');
+  if (sorted !== 'application,audio,video') return fail('sdp-media');
+  if (fingerprints.size !== 1) return fail('sdp-fingerprint-count');
+  if (setups.size !== 1) return fail('sdp-setup');
+  const setup = [...setups][0];
+  if (type === 'offer' && setup !== 'actpass') return fail('sdp-setup');
+  if (type === 'answer' && setup !== 'active' && setup !== 'passive') return fail('sdp-setup');
+  if (!ufrag || !pwd || !/^[A-Za-z0-9+/]{4,256}$/.test(ufrag) || !/^[A-Za-z0-9+/]{22,256}$/.test(pwd)) {
+    return fail('sdp-ice');
+  }
+
+  const [alg, value] = [...fingerprints][0].split(' ');
+  return { ok: true, fingerprint: { alg, value }, setup, candidates };
+}
+
+// Minimal candidate parser for diagnostics only; never used for security decisions.
+function parseCandidate(str) {
+  const m = /^candidate:\S+ \d+ (udp|tcp) \d+ (\S+) (\d+) typ (host|srflx|prflx|relay)/i.exec(str);
+  if (!m) return null;
+  return { protocol: m[1].toLowerCase(), address: m[2], port: Number(m[3]), type: m[4].toLowerCase() };
+}
+
+function summarizeCandidates(candidates) {
+  const s = { host: 0, srflx: 0, relay: 0, prflx: 0, mdns: 0, tcp: 0 };
+  for (const c of candidates) {
+    s[c.type] = (s[c.type] || 0) + 1;
+    if (c.address.endsWith('.local')) s.mdns++;
+    if (c.protocol === 'tcp') s.tcp++;
+  }
+  return s;
+}
+
+// Canonical byte form of a fingerprint for hashing: "sha-256 AB:CD:...".
+function fingerprintString(fp) {
+  return fp.alg.toLowerCase() + ' ' + fp.value.toUpperCase();
+}
+
+function normalizeStatsFingerprint(alg, value) {
+  if (typeof alg !== 'string' || typeof value !== 'string') return null;
+  return alg.toLowerCase() + ' ' + value.toUpperCase();
+}
+
+// Separate the remote candidates from an SDP so they can be supplied (and
+// re-supplied) with the standard addIceCandidate() API. Candidates are
+// de-duplicated by transport address and attached to the first BUNDLE mid,
+// which carries the single shared transport (bundlePolicy: max-bundle).
+function splitCandidates(sdp) {
+  const lines = sdp.slice(0, -2).split('\r\n');
+  const bundle = lines.find((l) => l.startsWith('a=group:BUNDLE '));
+  let currentMid = null;
+  const firstMid = bundle ? bundle.split(' ')[1] : null;
+  const seen = new Set();
+  const candidates = [];
+  const kept = [];
+  for (const line of lines) {
+    if (line.startsWith('m=')) currentMid = null;
+    if (line.startsWith('a=mid:')) currentMid = line.slice(6);
+    if (line.startsWith('a=candidate:')) {
+      const c = parseCandidate(line.slice(2));
+      const key = c ? `${c.protocol} ${c.address} ${c.port} ${c.type}` : line;
+      if (!seen.has(key)) {
+        seen.add(key);
+        candidates.push({ candidate: line.slice(2), sdpMid: firstMid || currentMid || '0' });
+      }
+      continue;
+    }
+    if (line === 'a=end-of-candidates') continue;
+    kept.push(line);
+  }
+  return { sdp: kept.join('\r\n') + '\r\n', candidates };
+}
+
+// A copy of a candidate with a different foundation. Re-adding the same address
+// under a new foundation makes the ICE agent start fresh connectivity checks,
+// which keeps this side's router "pinhole" toward the other side open while
+// waiting for them to add the reply (see session.js: refreshRemoteCandidates).
+function refreshFoundation(candidate, round) {
+  return candidate.replace(/^candidate:([A-Za-z0-9+/]{1,32})/, (m, f) => `candidate:${f.slice(0, 24)}r${round}`);
+}
+
+// ---- protocol.js ----
+// Strict schemas for everything received from the other side: the invitation,
+// the reply, and the small control messages sent over the encrypted data channel.
+// Unknown or extra fields are rejected rather than ignored.
+
+
+
+
+
+const SID_BYTES = 16;
+const NONCE_BYTES = 32;
+const COMMIT_BYTES = 32;
+
+function exactKeys(obj, keys) {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false;
+  const k = Object.keys(obj);
+  return k.length === keys.length && keys.every((x) => Object.prototype.hasOwnProperty.call(obj, x));
+}
+
+function b64Field(v, len) {
+  if (typeof v !== 'string' || v.length > 64) return null;
+  const b = base64urlDecode(v);
+  return b && b.length === len ? b : null;
+}
+
+function validTimestamp(ts) {
+  return Number.isSafeInteger(ts) && ts > 1.6e9 && ts < 1e10;
+}
+
+// Invitation (offer) payload.
+function parseInvite(p) {
+  if (!exactKeys(p, ['v', 'sid', 'ts', 'media', 'commit', 'sdp'])) return { ok: false, error: 'schema' };
+  if (p.v !== PROTOCOL_VERSION) return { ok: false, error: 'schema' };
+  const sid = b64Field(p.sid, SID_BYTES);
+  const commit = b64Field(p.commit, COMMIT_BYTES);
+  if (!sid || !commit) return { ok: false, error: 'schema' };
+  if (!validTimestamp(p.ts)) return { ok: false, error: 'schema' };
+  if (p.media !== 'video' && p.media !== 'audio') return { ok: false, error: 'schema' };
+  const sdpInfo = inspectSdp(p.sdp, 'offer');
+  if (!sdpInfo.ok) return { ok: false, error: 'sdp', detail: sdpInfo.error };
+  return { ok: true, sid, sidText: p.sid, ts: p.ts, media: p.media, commit, sdp: p.sdp, sdpInfo };
+}
+
+// Reply (answer) payload.
+function parseReply(p) {
+  if (!exactKeys(p, ['v', 'sid', 'ts', 'nb', 'sdp'])) return { ok: false, error: 'schema' };
+  if (p.v !== PROTOCOL_VERSION) return { ok: false, error: 'schema' };
+  const sid = b64Field(p.sid, SID_BYTES);
+  const nb = b64Field(p.nb, NONCE_BYTES);
+  if (!sid || !nb) return { ok: false, error: 'schema' };
+  if (!validTimestamp(p.ts)) return { ok: false, error: 'schema' };
+  const sdpInfo = inspectSdp(p.sdp, 'answer');
+  if (!sdpInfo.ok) return { ok: false, error: 'sdp', detail: sdpInfo.error };
+  return { ok: true, sid, sidText: p.sid, ts: p.ts, nb, sdp: p.sdp, sdpInfo };
+}
+
+const CONTROL_MAX_BYTES = 512;
+
+// Control messages over the data channel (already inside DTLS).
+function parseControl(data) {
+  if (typeof data !== 'string' || data.length > CONTROL_MAX_BYTES) return null;
+  let m;
+  try {
+    m = JSON.parse(data);
+  } catch {
+    return null;
+  }
+  if (!m || typeof m !== 'object' || Array.isArray(m)) return null;
+  switch (m.t) {
+    case 'reveal': {
+      if (!exactKeys(m, ['t', 'na'])) return null;
+      const na = b64Field(m.na, NONCE_BYTES);
+      return na ? { t: 'reveal', na } : null;
+    }
+    case 'state':
+      if (!exactKeys(m, ['t', 'mic', 'cam'])) return null;
+      if (typeof m.mic !== 'boolean' || typeof m.cam !== 'boolean') return null;
+      return { t: 'state', mic: m.mic, cam: m.cam };
+    case 'confirmed':
+    case 'bye':
+      return exactKeys(m, ['t']) ? { t: m.t } : null;
+    default:
+      return null;
+  }
+}
+
+const SIZES = { SID_BYTES, NONCE_BYTES };
+
+// ---- sas.js ----
+// Short Authentication String (security code) protocol.
+//
+// Goal: detect a "person in the middle" who swapped the DTLS certificates in the
+// invitation and/or reply. This follows the commit-then-reveal idea of ZRTP
+// (RFC 6189) adapted to WebRTC's DTLS-SRTP:
+//
+//   Invitation (offer):  sid, commit = H("commit", sid, nA), offer SDP (cert fpO)
+//   Reply (answer):      sid, nB, answer SDP (cert fpA)
+//   After DTLS is up:    offerer reveals nA over the encrypted data channel;
+//                        answerer checks H(nA) == commit.
+//   Both show:           code = H("sas", sid, fpO, fpA, nA, nB) as 6 digits.
+//
+// An attacker who substitutes certificates must commit to every value it sends
+// before learning nA (nA is hidden in the commitment until the DTLS sessions,
+// and therefore the certificates, are fixed). So it cannot search for
+// certificates that make both sides display the same code: the two codes match
+// by chance with probability about 1 in 1,000,000 per attempt, and each attempt
+// is a visible call that the users must accept.
+//
+// The code proves "no one is in the middle of THIS call". It does not prove who
+// the other person is; people do that by recognising each other.
+
+
+
+
+const COMMIT_LABEL = 'PrivateCall commit v1';
+const SAS_LABEL = 'PrivateCall SAS v1';
+const SAS_DIGITS = 6;
+
+async function makeCommit(sid, nonceA) {
+  return sha256(lengthPrefixed([COMMIT_LABEL, sid, nonceA]));
+}
+
+async function checkCommit(sid, nonceA, commit) {
+  return bytesEqual(await makeCommit(sid, nonceA), commit);
+}
+
+async function deriveSas({ sid, offerFingerprint, answerFingerprint, nonceA, nonceB }) {
+  const h = await sha256(
+    lengthPrefixed([
+      SAS_LABEL,
+      sid,
+      fingerprintString(offerFingerprint),
+      fingerprintString(answerFingerprint),
+      nonceA,
+      nonceB,
+    ]),
+  );
+  // 64 bits reduced mod 10^6: bias is below 2^-44, negligible.
+  let n = 0n;
+  for (let i = 0; i < 8; i++) n = (n << 8n) | BigInt(h[i]);
+  return (n % 10n ** BigInt(SAS_DIGITS)).toString().padStart(SAS_DIGITS, '0');
+}
+
+// ---- ice.js ----
+// Network path configuration: public STUN helpers and optional user-supplied relay.
+//
+// STUN servers only tell each computer its public address; they never see call
+// content, but they do learn that this IP address is starting a call, and when.
+// A relay (TURN) forwards the encrypted media when a direct path is impossible.
+// No relay credentials are built into the app: a relay operator gives users a
+// short-lived "relay code" (see tools/make-relay-code.mjs).
+
+
+
+const DEFAULT_STUN = ['stun:stun.l.google.com:19302', 'stun:stun.cloudflare.com:3478'];
+
+function buildIceConfig(settings) {
+  const iceServers = [];
+  const relayOnly = !!(settings.relay && settings.relayOnly);
+  // In relay-only mode public STUN servers are useless (their results are never
+  // offered), so they are not contacted at all: one fewer party learns of the call.
+  if (settings.useStun && !relayOnly) iceServers.push({ urls: DEFAULT_STUN.slice() });
+  if (settings.relay) {
+    iceServers.push({
+      urls: settings.relay.urls.slice(),
+      username: settings.relay.username,
+      credential: settings.relay.credential,
+    });
+  }
+  return {
+    iceServers,
+    iceTransportPolicy: relayOnly ? 'relay' : 'all',
+    bundlePolicy: 'max-bundle',
+    rtcpMuxPolicy: 'require',
+    iceCandidatePoolSize: 0,
+  };
+}
+
+const RELAY_PREFIX = 'PCRELAY1:';
+
+// Relay code: "PCRELAY1:" + base64 (unpadded, standard alphabet)(JSON {u: [urls], n: username, c: credential, e: expiry, l?: label})
+function parseRelayCode(text, nowSec = Math.floor(Date.now() / 1000)) {
+  if (typeof text !== 'string') return { ok: false, error: 'relay-invalid' };
+  const t = text.replace(/\s+/g, '');
+  if (t.length > 2000 || !t.toUpperCase().startsWith(RELAY_PREFIX)) return { ok: false, error: 'relay-invalid' };
+  const bytes = base64Decode(t.slice(RELAY_PREFIX.length));
+  if (!bytes) return { ok: false, error: 'relay-invalid' };
+  let o;
+  try {
+    o = JSON.parse(utf8Decode(bytes));
+  } catch {
+    return { ok: false, error: 'relay-invalid' };
+  }
+  if (!o || typeof o !== 'object' || Array.isArray(o)) return { ok: false, error: 'relay-invalid' };
+  const allowed = new Set(['u', 'n', 'c', 'e', 'l']);
+  if (Object.keys(o).some((k) => !allowed.has(k))) return { ok: false, error: 'relay-invalid' };
+  if (!Array.isArray(o.u) || o.u.length < 1 || o.u.length > 4) return { ok: false, error: 'relay-invalid' };
+  for (const u of o.u) {
+    if (typeof u !== 'string' || u.length > 256) return { ok: false, error: 'relay-invalid' };
+    // turn:host[:port][?transport=udp|tcp] or turns:host[:port][?transport=tcp]
+    if (!/^turns?:[A-Za-z0-9.\-[\]:]+(\?transport=(udp|tcp))?$/.test(u)) return { ok: false, error: 'relay-invalid' };
+  }
+  if (typeof o.n !== 'string' || o.n.length < 1 || o.n.length > 256) return { ok: false, error: 'relay-invalid' };
+  if (typeof o.c !== 'string' || o.c.length < 1 || o.c.length > 256) return { ok: false, error: 'relay-invalid' };
+  if (!Number.isSafeInteger(o.e)) return { ok: false, error: 'relay-invalid' };
+  if (o.l !== undefined && (typeof o.l !== 'string' || o.l.length > 60)) return { ok: false, error: 'relay-invalid' };
+  if (o.e <= nowSec) return { ok: false, error: 'relay-expired' };
+  return {
+    ok: true,
+    relay: { urls: o.u, username: o.n, credential: o.c, expires: o.e, label: o.l || '' },
+  };
+}
+
+// ---- gather.js ----
+// When to stop collecting network candidates (non-trickle ICE).
+//
+// Because the invitation and reply are each sent once, any candidate gathered
+// after the message is produced is lost for this call. Reliability therefore
+// comes first: we wait for the browser to report gathering "complete".
+//
+// Measured in the network lab (Chromium 153, see docs/TESTING.md): with reachable
+// STUN/TURN servers, gathering completes in ~0.1-0.2 s, so waiting costs nothing.
+// It is only slow when a server is unreachable: ~26 s when its DNS name cannot be
+// resolved, ~40 s when UDP is blocked. Waiting that long cannot produce candidates
+// from an unreachable server, so after a generous minimum we stop once no new
+// candidate has appeared for a while -- but never while a configured relay
+// (the fallback that makes restrictive networks work) is still being contacted,
+// when the browser lets us tell which server each result came from.
+
+const GATHER_POLICY = {
+  minMs: 15000, // never stop before this unless gathering is complete
+  quietMs: 4000, // ...and only after this long without a new candidate
+  maxMs: 30000, // hard cap: an invitation must eventually be produced
+};
+
+// state: {
+//   elapsedMs, msSinceLastCandidate, complete,
+//   relayUrls: string[]            relay (TURN) URLs configured
+//   settledRelayUrls: Set<string>  relay URLs that produced a candidate or an error
+//   attribution: boolean           browser reports which server a result came from
+//   haveRelayCandidate: boolean    at least one relay candidate was gathered
+// }
+// returns { done: boolean, reason }
+function gatherDecision(state, policy = GATHER_POLICY) {
+  if (state.complete) return { done: true, reason: 'complete' };
+  if (state.elapsedMs >= policy.maxMs) return { done: true, reason: 'cap' };
+  if (state.elapsedMs < policy.minMs) return { done: false, reason: 'min' };
+  if (state.msSinceLastCandidate < policy.quietMs) return { done: false, reason: 'active' };
+  // A relay is the fallback that makes restrictive networks work. Until we hold a
+  // relay candidate, keep waiting for any relay URL that has not answered yet.
+  // Once we hold one, other relay transports (UDP/TCP/TLS to the same relay) add
+  // no new reachability: all relay candidates are the relay's public address.
+  if (state.relayUrls.length > 0 && state.attribution && !state.haveRelayCandidate) {
+    const pending = state.relayUrls.filter((u) => !state.settledRelayUrls.has(u));
+    if (pending.length > 0) return { done: false, reason: 'relay-pending' };
+  }
+  return { done: true, reason: 'quiet' };
+}
+
+function relayUrlsOf(iceConfig) {
+  const out = [];
+  for (const s of iceConfig.iceServers || []) {
+    for (const u of [].concat(s.urls)) if (/^turns?:/i.test(u)) out.push(u);
+  }
+  return out;
+}
+
+// ---- media.js ----
+// Camera and microphone handling. Devices are only ever opened after an explicit
+// click, and every track this module opens is stopped by stopStream().
+
+const AUDIO_CONSTRAINTS = {
+  echoCancellation: true,
+  noiseSuppression: true,
+  autoGainControl: true,
+  channelCount: 1,
+};
+
+// 720p is a ceiling, not a target: the browser's congestion control lowers
+// resolution and frame rate automatically on weak connections.
+const VIDEO_CONSTRAINTS = {
+  width: { ideal: 1280 },
+  height: { ideal: 720 },
+  frameRate: { ideal: 30, max: 30 },
+  facingMode: 'user',
+};
+
+function mediaSupport() {
+  return {
+    rtc: typeof RTCPeerConnection === 'function',
+    gum: !!(typeof navigator !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+    secure: typeof isSecureContext === 'undefined' ? true : isSecureContext,
+    crypto: !!(globalThis.crypto && crypto.subtle),
+    compression: deflateRawSupported(),
+    certificates: typeof RTCPeerConnection === 'function' && typeof RTCPeerConnection.generateCertificate === 'function',
+  };
+}
+
+// 'deflate-raw' arrived later than CompressionStream itself (Chrome 103, Firefox 113),
+// so construct it rather than only checking that the class exists.
+function deflateRawSupported() {
+  try {
+    new CompressionStream('deflate-raw');
+    new DecompressionStream('deflate-raw');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function classifyMediaError(err) {
+  const name = err && err.name;
+  switch (name) {
+    case 'NotAllowedError':
+    case 'SecurityError':
+    case 'PermissionDeniedError':
+      return 'permission-denied';
+    case 'NotFoundError':
+    case 'DevicesNotFoundError':
+    case 'OverconstrainedError':
+      return 'not-found';
+    case 'NotReadableError':
+    case 'TrackStartError':
+    case 'AbortError':
+      return 'in-use';
+    default:
+      return 'unknown';
+  }
+}
+
+// Opens the microphone (required) and optionally the camera.
+// If only the camera fails, returns an audio-only stream and a notice code.
+async function openLocalMedia(wantVideo) {
+  const md = navigator.mediaDevices;
+  if (wantVideo) {
+    try {
+      const stream = await md.getUserMedia({ audio: AUDIO_CONSTRAINTS, video: VIDEO_CONSTRAINTS });
+      return { ok: true, stream, notice: null };
+    } catch (err) {
+      const kind = classifyMediaError(err);
+      if (kind === 'permission-denied') return { ok: false, error: 'permission-denied' };
+      // Fall through: maybe only the camera is missing or busy.
+      try {
+        const stream = await md.getUserMedia({ audio: AUDIO_CONSTRAINTS });
+        return { ok: true, stream, notice: kind === 'in-use' ? 'camera-busy' : 'camera-missing' };
+      } catch (err2) {
+        return { ok: false, error: classifyMediaError(err2) };
+      }
+    }
+  }
+  try {
+    const stream = await md.getUserMedia({ audio: AUDIO_CONSTRAINTS });
+    return { ok: true, stream, notice: null };
+  } catch (err) {
+    return { ok: false, error: classifyMediaError(err) };
+  }
+}
+
+async function openCamera() {
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({ video: VIDEO_CONSTRAINTS });
+    return { ok: true, track: s.getVideoTracks()[0] };
+  } catch (err) {
+    return { ok: false, error: classifyMediaError(err) };
+  }
+}
+
+function stopStream(stream) {
+  if (!stream) return;
+  for (const t of stream.getTracks()) {
+    try {
+      t.stop();
+    } catch {
+      /* already stopped */
+    }
+  }
+}
+
+// Restrict negotiated codecs to widely interoperable, well-tested ones. This uses
+// the standard setCodecPreferences API (no SDP editing) and silently keeps the
+// browser defaults if the API is missing or rejects the list.
+function applyCodecPreferences(transceiver, kind) {
+  try {
+    if (typeof transceiver.setCodecPreferences !== 'function' || !RTCRtpReceiver.getCapabilities) return false;
+    const caps = RTCRtpReceiver.getCapabilities(kind);
+    if (!caps || !caps.codecs) return false;
+    let keep;
+    if (kind === 'audio') {
+      const opus = caps.codecs.filter((c) => /^audio\/opus$/i.test(c.mimeType));
+      const red = caps.codecs.filter((c) => /^audio\/red$/i.test(c.mimeType));
+      keep = [...opus, ...red];
+      if (opus.length === 0) return false;
+    } else {
+      const fmtp = (c) => c.sdpFmtpLine || '';
+      const vp8 = caps.codecs.filter((c) => /^video\/VP8$/i.test(c.mimeType));
+      const vp9 = caps.codecs.filter((c) => /^video\/VP9$/i.test(c.mimeType) && /profile-id=0|^$/.test(fmtp(c)));
+      const h264 = caps.codecs.filter(
+        (c) => /^video\/H264$/i.test(c.mimeType) && /packetization-mode=1/.test(fmtp(c)) && /profile-level-id=42e01f/i.test(fmtp(c)),
+      );
+      const rtx = caps.codecs.filter((c) => /^video\/rtx$/i.test(c.mimeType));
+      if (vp8.length === 0) return false;
+      keep = [...vp8, ...vp9, ...h264, ...rtx];
+    }
+    transceiver.setCodecPreferences(keep);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Audio first: give the voice stream priority and cap video so a weak uplink is
+// not saturated by video at the expense of speech.
+async function tuneSenders(audioSender, videoSender) {
+  const apply = async (sender, fn) => {
+    try {
+      const p = sender.getParameters();
+      if (!p.encodings || p.encodings.length === 0) return;
+      fn(p.encodings[0]);
+      await sender.setParameters(p);
+    } catch {
+      /* best effort: browser keeps its defaults */
+    }
+  };
+  if (audioSender) {
+    await apply(audioSender, (e) => {
+      e.priority = 'high';
+      e.networkPriority = 'high';
+    });
+  }
+  if (videoSender) {
+    await apply(videoSender, (e) => {
+      e.maxBitrate = 1_500_000;
+      e.priority = 'low';
+    });
+  }
+}
+
+// Microphone level meter for the preview ("is my mic working?"). Local only.
+function createLevelMeter(stream, onLevel) {
+  const track = stream && stream.getAudioTracks()[0];
+  const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
+  if (!track || !AC) return { stop() {} };
+  let ctx;
+  try {
+    ctx = new AC();
+  } catch {
+    return { stop() {} };
+  }
+  const src = ctx.createMediaStreamSource(new MediaStream([track]));
+  const analyser = ctx.createAnalyser();
+  analyser.fftSize = 512;
+  src.connect(analyser);
+  const buf = new Float32Array(analyser.fftSize);
+  let raf = 0;
+  let stopped = false;
+  const tick = () => {
+    if (stopped) return;
+    analyser.getFloatTimeDomainData(buf);
+    let sum = 0;
+    for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+    const rms = Math.sqrt(sum / buf.length);
+    onLevel(Math.min(1, rms * 4));
+    raf = requestAnimationFrame(tick);
+  };
+  ctx.resume().catch(() => {});
+  raf = requestAnimationFrame(tick);
+  return {
+    stop() {
+      stopped = true;
+      cancelAnimationFrame(raf);
+      try {
+        src.disconnect();
+      } catch {
+        /* ignore */
+      }
+      ctx.close().catch(() => {});
+    },
+  };
+}
+
+// ---- session.js ----
+// One call, from invitation to hang-up. Owns the RTCPeerConnection, the local
+// media, all timers and all secret values, and releases every one of them in end().
+//
+// Session states:
+//   idle -> preparing -> awaiting-reply (offerer) | reply-ready (answerer)
+//        -> connecting -> connected -> ended
+// Verification states (only meaningful once connected):
+//   waiting (security values not exchanged yet) -> ready (code shown)
+//        -> confirmed (user said the codes match)
+//
+// Outgoing media before confirmation: nothing. The microphone and camera tracks
+// are not attached to their RTP senders (replaceTrack(null)), so no packets carry
+// them. The user can open the microphone for a short window to read the code
+// aloud (speakForCode), or explicitly choose to talk before checking.
+
+
+
+
+
+
+
+
+
+const TIMEOUTS = {
+  gatherSlowNotice: 4000, // tell the user gathering is taking a while
+  speakWindow: 30000, // microphone window for reading the code aloud before confirming
+  // Joining side, while waiting for the reply to be added: re-supply the other
+  // side's addresses this often, so connectivity checks (and the router pinholes
+  // they open) never lapse. Measured: without this, port-restricted home NATs
+  // fail if the reply is added more than ~40 s after it was created.
+  candidateRefresh: 15000,
+  candidateRefreshMax: 15 * 60000,
+  connect: 45000, // offerer: from adding the reply to a working connection
+  reveal: 20000, // answerer: from channel open to receiving the security value
+  disconnected: 30000, // how long a dropped connection may try to recover
+  statsInterval: 2000,
+};
+
+// Invitation session IDs already used in this page (replay protection on the
+// joining side; the starting side only ever accepts one reply for its own ID).
+const usedInviteIds = new Set();
+
+function inviteAlreadyUsed(sidText) {
+  return usedInviteIds.has(sidText);
+}
+
+class CallSession {
+  constructor({ role, iceConfig, emit }) {
+    this.role = role; // 'offerer' | 'answerer'
+    this.iceConfig = iceConfig;
+    this._emit = emit || (() => {});
+    this.state = 'idle';
+    this.verify = 'waiting';
+    this.mediaMode = 'video';
+    this.pc = null;
+    this.dc = null;
+    this.localStream = null;
+    this.audioTx = null;
+    this.videoTx = null;
+    this.remoteAudioStream = null;
+    this.remoteVideoStream = null;
+    this.micOn = true;
+    this.cameraOn = false;
+    this.allowUnverifiedVideo = false;
+    this.allowUnverifiedAudio = false;
+    this.speaking = false; // microphone opened only to read the code aloud
+    this.speakUntil = 0;
+    this._speakTimer = 0;
+    this.remoteState = { mic: false, cam: false };
+    this.remoteConfirmed = false;
+    this.sid = null;
+    this.nonceA = null;
+    this.nonceB = null;
+    this.commit = null;
+    this.localFp = null;
+    this.remoteFp = null;
+    this.sas = null;
+    this.certCheck = 'pending'; // pending | matched | unavailable | mismatch
+    this.connectedAt = 0;
+    this.localCandidates = [];
+    this.remoteCandidates = [];
+    this.candidateErrors = [];
+    this.gatherResult = null; // { reason, ms }
+    this._lastCandidateAt = 0;
+    this._settledRelayUrls = new Set();
+    this._urlAttribution = false;
+    this.lastStats = null;
+    this._prevLoss = null;
+    this._timers = new Set();
+    this._ended = false;
+    this._wasDisconnected = false;
+    this._disconnectTimer = 0;
+  }
+
+  emit(type, data) {
+    try {
+      this._emit(type, data, this);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // ---------- timers ----------
+  _timeout(fn, ms) {
+    const id = setTimeout(() => {
+      this._timers.delete(id);
+      fn();
+    }, ms);
+    this._timers.add(id);
+    return id;
+  }
+  _clear(id) {
+    if (!id) return;
+    clearTimeout(id);
+    clearInterval(id);
+    this._timers.delete(id);
+  }
+  _interval(fn, ms) {
+    const id = setInterval(fn, ms);
+    this._timers.add(id);
+    return id;
+  }
+
+  // ---------- media ----------
+  async openMedia(wantVideo) {
+    this.mediaMode = wantVideo ? 'video' : 'audio';
+    const r = await openLocalMedia(wantVideo);
+    if (this._ended) {
+      if (r.ok) stopStream(r.stream);
+      return { ok: false, error: 'cancelled' };
+    }
+    if (!r.ok) return r;
+    this.localStream = r.stream;
+    this.cameraOn = r.stream.getVideoTracks().length > 0;
+    this.emit('local-media');
+    return r;
+  }
+
+  get audioTrack() {
+    return this.localStream ? this.localStream.getAudioTracks()[0] || null : null;
+  }
+  get videoTrack() {
+    return this.localStream ? this.localStream.getVideoTracks()[0] || null : null;
+  }
+
+  // ---------- peer connection ----------
+  async _createPeerConnection() {
+    const cert = await RTCPeerConnection.generateCertificate({ name: 'ECDSA', namedCurve: 'P-256' });
+    this._cert = cert;
+    const pc = new RTCPeerConnection({ ...this.iceConfig, certificates: [cert] });
+    this.pc = pc;
+    pc.onicecandidate = (e) => {
+      // Chromium reports the server on the candidate (RTCIceCandidate.url);
+      // the event-level url is the older, deprecated location.
+      this._noteServer((e.candidate && e.candidate.url) || e.url);
+      if (e.candidate && e.candidate.candidate) {
+        this._lastCandidateAt = Date.now();
+        const m = /typ (host|srflx|prflx|relay)/.exec(e.candidate.candidate);
+        this.localCandidates.push({
+          type: m ? m[1] : 'unknown',
+          protocol: (e.candidate.protocol || '').toLowerCase(),
+          address: e.candidate.address || '',
+        });
+      }
+    };
+    pc.onicecandidateerror = (e) => {
+      this._noteServer(e.url);
+      if (this.candidateErrors.length < 10) {
+        this.candidateErrors.push({ url: e.url || '', code: e.errorCode || 0 });
+      }
+    };
+    const onState = () => this._onConnectionState();
+    pc.onconnectionstatechange = onState;
+    pc.oniceconnectionstatechange = onState;
+
+    const dc = pc.createDataChannel('control', { negotiated: true, id: 0, ordered: true });
+    this.dc = dc;
+    dc.onopen = () => this._onChannelOpen();
+    dc.onmessage = (e) => this._onControl(e.data);
+    dc.onclose = () => {
+      if (!this._ended && this.state === 'connected') {
+        // The other side closed its connection (hung up, closed the tab, reloaded).
+        this._timeout(() => this.end('remote-hangup'), 300);
+      }
+    };
+    return pc;
+  }
+
+  _attachRemoteStreams() {
+    this.remoteAudioStream = new MediaStream([this.audioTx.receiver.track]);
+    this.remoteVideoStream = new MediaStream([this.videoTx.receiver.track]);
+    this.emit('remote-media');
+  }
+
+  // Which ICE server produced a candidate or an error (Chromium reports this).
+  _noteServer(url) {
+    if (typeof url !== 'string' || !url) return;
+    this._urlAttribution = true;
+    this._settledRelayUrls.add(url);
+  }
+
+  _waitForGathering() {
+    const pc = this.pc;
+    const relayUrls = relayUrlsOf(this.iceConfig);
+    return new Promise((resolve) => {
+      const started = Date.now();
+      this._lastCandidateAt = started;
+      let done = false;
+      let poll = 0;
+      let slow = 0;
+      const check = () => {
+        if (done) return;
+        if (this._ended || pc.signalingState === 'closed') return finish('closed');
+        const now = Date.now();
+        const d = gatherDecision({
+          elapsedMs: now - started,
+          msSinceLastCandidate: now - this._lastCandidateAt,
+          complete: pc.iceGatheringState === 'complete',
+          relayUrls,
+          settledRelayUrls: this._settledRelayUrls,
+          attribution: this._urlAttribution,
+          haveRelayCandidate: this.localCandidates.some((c) => c.type === 'relay'),
+        });
+        if (d.done) finish(d.reason);
+      };
+      const finish = (reason) => {
+        done = true;
+        this._clear(poll);
+        this._clear(slow);
+        pc.removeEventListener('icegatheringstatechange', check);
+        this.gatherResult = { reason, ms: Date.now() - started };
+        resolve();
+      };
+      pc.addEventListener('icegatheringstatechange', check);
+      poll = this._interval(check, 250);
+      slow = this._timeout(() => {
+        if (!done) this.emit('gathering-slow');
+      }, TIMEOUTS.gatherSlowNotice);
+      check();
+    });
+  }
+
+  _checkLocalDescription(type) {
+    const info = inspectSdp(this.pc.localDescription.sdp, type);
+    if (!info.ok) throw Object.assign(new Error('local SDP rejected: ' + info.error), { code: 'internal' });
+    // Without any network candidate the other side could never reach us; say so now
+    // rather than after the person has sent the message.
+    if (info.candidates.length === 0) {
+      const relayOnly = this.iceConfig.iceTransportPolicy === 'relay';
+      throw Object.assign(new Error('no candidates'), { code: relayOnly ? 'relay-unreachable' : 'no-network' });
+    }
+    // If the browser can tell us our certificate's fingerprint, it must be the one in our SDP.
+    if (this._cert && typeof this._cert.getFingerprints === 'function') {
+      const fps = this._cert.getFingerprints().map((f) => normalizeStatsFingerprint(f.algorithm, f.value));
+      if (fps.length && !fps.includes(fingerprintString(info.fingerprint))) {
+        throw Object.assign(new Error('certificate mismatch'), { code: 'internal' });
+      }
+    }
+    this.localFp = info.fingerprint;
+    return info;
+  }
+
+  // ---------- starting side ----------
+  async createInvitation(introText) {
+    if (this.state !== 'idle') throw new Error('bad state');
+    this.state = 'preparing';
+    const pc = await this._createPeerConnection();
+    // Both senders start empty; tracks are attached only when allowed (see header).
+    this.audioTx = pc.addTransceiver('audio', { direction: 'sendrecv' });
+    this.videoTx = pc.addTransceiver('video', { direction: 'sendrecv' });
+    applyCodecPreferences(this.audioTx, 'audio');
+    applyCodecPreferences(this.videoTx, 'video');
+    this._attachRemoteStreams();
+    await pc.setLocalDescription();
+    await this._waitForGathering();
+    if (this._ended) return null;
+    const info = this._checkLocalDescription('offer');
+
+    this.sid = randomBytes(SIZES.SID_BYTES);
+    this.nonceA = randomBytes(SIZES.NONCE_BYTES);
+    this.commit = await makeCommit(this.sid, this.nonceA);
+    const text = await encodeEnvelope(
+      'invite',
+      {
+        v: PROTOCOL_VERSION,
+        sid: base64urlEncode(this.sid),
+        ts: Math.floor(Date.now() / 1000),
+        media: this.mediaMode,
+        commit: base64urlEncode(this.commit),
+        sdp: pc.localDescription.sdp,
+      },
+      introText,
+    );
+    if (this._ended) return null;
+    this.localSummary = summarizeCandidates(info.candidates);
+    this.state = 'awaiting-reply';
+    this.emit('state');
+    return text;
+  }
+
+  // reply: output of protocol.parseReply()
+  async acceptReply(reply) {
+    if (this.role !== 'offerer' || this.state !== 'awaiting-reply') return { ok: false, error: 'reply-unexpected' };
+    if (!bytesEqual(reply.sid, this.sid)) return { ok: false, error: 'reply-mismatch' };
+    this.state = 'connecting';
+    this.nonceB = reply.nb;
+    this.remoteFp = reply.sdpInfo.fingerprint;
+    this.remoteCandidates = reply.sdpInfo.candidates;
+    this.emit('state');
+    try {
+      await this.pc.setRemoteDescription({ type: 'answer', sdp: reply.sdp });
+    } catch (e) {
+      this.end('connect-failed', { cause: 'remote-description' });
+      return { ok: false, error: 'reply-invalid' };
+    }
+    this._connectTimer = this._timeout(() => {
+      if (this.state !== 'connected') this.end('connect-failed', { cause: 'timeout' });
+    }, TIMEOUTS.connect);
+    return { ok: true };
+  }
+
+  // ---------- joining side ----------
+  // invite: output of protocol.parseInvite()
+  async acceptInvitation(invite, introText) {
+    if (this.state !== 'idle') throw new Error('bad state');
+    if (usedInviteIds.has(invite.sidText)) return { ok: false, error: 'replay' };
+    usedInviteIds.add(invite.sidText);
+    this.state = 'preparing';
+    this.sid = invite.sid;
+    this.commit = invite.commit;
+    this.remoteFp = invite.sdpInfo.fingerprint;
+    this.remoteCandidates = invite.sdpInfo.candidates;
+    this.mediaMode = invite.media;
+
+    const pc = await this._createPeerConnection();
+    // The offer's candidates are supplied separately (standard trickle API) so that
+    // they can be re-supplied while we wait; see _refreshRemoteCandidates().
+    const split = splitCandidates(invite.sdp);
+    this._remoteIce = split.candidates;
+    try {
+      await pc.setRemoteDescription({ type: 'offer', sdp: split.sdp });
+    } catch {
+      // Passed our structural checks but the browser's WebRTC engine refused it.
+      this.end('internal', { silent: true });
+      return { ok: false, error: 'invalid' };
+    }
+    const txs = pc.getTransceivers();
+    this.audioTx = txs.find((t) => t.receiver.track.kind === 'audio');
+    this.videoTx = txs.find((t) => t.receiver.track.kind === 'video');
+    if (!this.audioTx || !this.videoTx) {
+      this.end('internal', { silent: true });
+      return { ok: false, error: 'invalid' };
+    }
+    this.audioTx.direction = 'sendrecv';
+    this.videoTx.direction = 'sendrecv';
+    applyCodecPreferences(this.audioTx, 'audio');
+    applyCodecPreferences(this.videoTx, 'video');
+    this._attachRemoteStreams();
+    await pc.setLocalDescription();
+    await this._waitForGathering();
+    if (this._ended) return { ok: false, error: 'cancelled' };
+    const info = this._checkLocalDescription('answer');
+
+    this.nonceB = randomBytes(SIZES.NONCE_BYTES);
+    const text = await encodeEnvelope(
+      'reply',
+      {
+        v: PROTOCOL_VERSION,
+        sid: base64urlEncode(this.sid),
+        ts: Math.floor(Date.now() / 1000),
+        nb: base64urlEncode(this.nonceB),
+        sdp: pc.localDescription.sdp,
+      },
+      introText,
+    );
+    if (this._ended) return { ok: false, error: 'cancelled' };
+    this.localSummary = summarizeCandidates(info.candidates);
+    this.state = 'reply-ready';
+    this.emit('state');
+    this._refreshRemoteCandidates(0);
+    return { ok: true, text };
+  }
+
+  // Supply the other side's candidates; then, until connected, supply them again
+  // every TIMEOUTS.candidateRefresh under fresh foundations. Each round restarts
+  // connectivity checks toward the same addresses (nothing new is revealed).
+  async _refreshRemoteCandidates(round) {
+    if (this._ended || this.state === 'connected' || !this.pc) return;
+    for (const c of this._remoteIce || []) {
+      try {
+        await this.pc.addIceCandidate({ candidate: round === 0 ? c.candidate : refreshFoundation(c.candidate, round), sdpMid: c.sdpMid });
+      } catch {
+        /* a candidate the browser cannot use (e.g. unresolvable name) */
+      }
+      if (this._ended || !this.pc) return;
+    }
+    if (round === 0) this._refreshStarted = Date.now();
+    if (Date.now() - this._refreshStarted >= TIMEOUTS.candidateRefreshMax) {
+      this.emit('path-trouble');
+      return;
+    }
+    this._refreshTimer = this._timeout(() => this._refreshRemoteCandidates(round + 1), TIMEOUTS.candidateRefresh);
+  }
+
+  // ---------- connection lifecycle ----------
+  _connState() {
+    const pc = this.pc;
+    if (!pc) return 'closed';
+    if (pc.connectionState) return pc.connectionState;
+    const ice = pc.iceConnectionState;
+    return ice === 'completed' ? 'connected' : ice === 'checking' ? 'connecting' : ice;
+  }
+
+  _onConnectionState() {
+    if (this._ended) return;
+    const s = this._connState();
+    if (s === 'connected') {
+      if (!this.connectedAt) this._onConnected();
+      else if (this._wasDisconnected) {
+        this._wasDisconnected = false;
+        this._clear(this._disconnectTimer);
+        this.emit('stable');
+      }
+    } else if (s === 'disconnected') {
+      if (this.connectedAt && !this._wasDisconnected) {
+        this._wasDisconnected = true;
+        this.emit('unstable');
+        this._disconnectTimer = this._timeout(() => {
+          if (this._connState() !== 'connected') this.end('connection-lost');
+        }, TIMEOUTS.disconnected);
+      }
+    } else if (s === 'failed') {
+      // Before the first connection, "failed" is not final in practice: checks
+      // restart (the joining side re-supplies candidates) and browsers recover.
+      // The offerer's connect timer and the refresh limit decide when to give up.
+      if (this.connectedAt) this.end('connection-lost');
+    }
+  }
+
+  _onConnected() {
+    this.connectedAt = Date.now();
+    this.state = 'connected';
+    this._clear(this._connectTimer);
+    this.emit('connected');
+    this._checkCertificates();
+    tuneSenders(this.audioTx.sender, this.videoTx.sender);
+    this._statsTimer = this._interval(() => this._sampleStats(), TIMEOUTS.statsInterval);
+    this._sampleStats();
+  }
+
+  // Defence in depth: compare the certificates the browser actually used in the
+  // DTLS handshake (from getStats) with the fingerprints the code is computed over.
+  // Browsers already enforce this match; if they ever didn't, we end the call.
+  async _checkCertificates() {
+    for (let attempt = 0; attempt < 4 && !this._ended; attempt++) {
+      let report;
+      try {
+        report = await this.pc.getStats();
+      } catch {
+        break;
+      }
+      let transport = null;
+      report.forEach((s) => {
+        if (s.type === 'transport' && s.remoteCertificateId) transport = s;
+      });
+      if (transport) {
+        const local = report.get(transport.localCertificateId);
+        const remote = report.get(transport.remoteCertificateId);
+        if (local && remote) {
+          const okLocal = normalizeStatsFingerprint(local.fingerprintAlgorithm, local.fingerprint) === fingerprintString(this.localFp);
+          const okRemote = normalizeStatsFingerprint(remote.fingerprintAlgorithm, remote.fingerprint) === fingerprintString(this.remoteFp);
+          if (okLocal && okRemote) {
+            this.certCheck = 'matched';
+            this.emit('cert-check');
+            return;
+          }
+          this.certCheck = 'mismatch';
+          this.end('security-failed', { cause: 'certificate' });
+          return;
+        }
+      }
+      await new Promise((r) => this._timeout(r, 500));
+    }
+    if (!this._ended) {
+      this.certCheck = 'unavailable';
+      this.emit('cert-check');
+    }
+  }
+
+  _send(obj) {
+    if (this.dc && this.dc.readyState === 'open') {
+      try {
+        this.dc.send(JSON.stringify(obj));
+      } catch {
+        /* channel closing */
+      }
+    }
+  }
+
+  async _onChannelOpen() {
+    if (this._ended) return;
+    this._sendState();
+    if (this.role === 'offerer') {
+      // The DTLS handshake has completed, so the certificates are now fixed and
+      // it is safe to reveal the value we committed to in the invitation.
+      this._send({ t: 'reveal', na: base64urlEncode(this.nonceA) });
+      await this._computeSas();
+    } else {
+      this._revealTimer = this._timeout(() => {
+        if (!this.sas) this.end('security-failed', { cause: 'no-reveal' });
+      }, TIMEOUTS.reveal);
+    }
+  }
+
+  async _onControl(data) {
+    if (this._ended) return;
+    const m = parseControl(data);
+    if (!m) return;
+    switch (m.t) {
+      case 'reveal':
+        if (this.role !== 'answerer' || this.nonceA || this.sas) return;
+        if (!(await checkCommit(this.sid, m.na, this.commit))) {
+          this.end('security-failed', { cause: 'commit' });
+          return;
+        }
+        this.nonceA = m.na;
+        this._clear(this._revealTimer);
+        await this._computeSas();
+        break;
+      case 'state':
+        this.remoteState = { mic: m.mic, cam: m.cam };
+        this.emit('remote-state');
+        break;
+      case 'confirmed':
+        this.remoteConfirmed = true;
+        this.emit('remote-confirmed');
+        break;
+      case 'bye':
+        this.end('remote-hangup');
+        break;
+      default:
+    }
+  }
+
+  async _computeSas() {
+    const offerer = this.role === 'offerer';
+    const code = await deriveSas({
+      sid: this.sid,
+      offerFingerprint: offerer ? this.localFp : this.remoteFp,
+      answerFingerprint: offerer ? this.remoteFp : this.localFp,
+      nonceA: this.nonceA,
+      nonceB: this.nonceB,
+    });
+    if (this._ended) return;
+    this.sas = code;
+    this.verify = 'ready';
+    this.emit('sas', code);
+  }
+
+  confirmCode() {
+    if (this.verify !== 'ready' || this._ended) return;
+    this.verify = 'confirmed';
+    this._clear(this._speakTimer);
+    this.speaking = false;
+    this._send({ t: 'confirmed' });
+    this._syncAudioSender();
+    this._syncVideoSender();
+    this.emit('verified');
+  }
+
+  rejectCode() {
+    this.end('code-mismatch');
+  }
+
+  // ---------- local controls ----------
+  get videoAllowed() {
+    return this.verify === 'confirmed' || this.allowUnverifiedVideo;
+  }
+
+  get audioAllowed() {
+    return this.verify === 'confirmed' || this.allowUnverifiedAudio || this.speaking;
+  }
+
+  get sendingAudio() {
+    return !!(this.audioTx && this.audioTx.sender.track && this.micOn);
+  }
+
+  async _syncAudioSender() {
+    if (!this.audioTx || this._ended) return;
+    const want = this.audioAllowed ? this.audioTrack : null;
+    if (this.audioTx.sender.track !== want) {
+      try {
+        await this.audioTx.sender.replaceTrack(want);
+      } catch (e) {
+        console.warn('replaceTrack failed', e);
+      }
+    }
+    this._sendState();
+    this.emit('local-media');
+  }
+
+  // Open the microphone for a short window, only to read the code aloud.
+  speakForCode(on) {
+    if (this._ended || this.state !== 'connected' || this.verify === 'confirmed') return;
+    this._clear(this._speakTimer);
+    this.speaking = !!on;
+    this.speakUntil = on ? Date.now() + TIMEOUTS.speakWindow : 0;
+    if (on) {
+      if (!this.micOn) this.setMic(true);
+      this._speakTimer = this._timeout(() => this.speakForCode(false), TIMEOUTS.speakWindow);
+    }
+    this._syncAudioSender();
+  }
+
+  // The user chose to talk before checking the code (after a warning).
+  allowTalkUnverified() {
+    if (this._ended) return;
+    this.allowUnverifiedAudio = true;
+    this._clear(this._speakTimer);
+    this.speaking = false;
+    this._syncAudioSender();
+  }
+
+  get sendingVideo() {
+    return !!(this.videoTx && this.videoTx.sender.track);
+  }
+
+  async _syncVideoSender() {
+    if (!this.videoTx || this._ended) return;
+    const want = this.cameraOn && this.videoAllowed ? this.videoTrack : null;
+    if (this.videoTx.sender.track !== want) {
+      try {
+        await this.videoTx.sender.replaceTrack(want);
+      } catch (e) {
+        console.warn('replaceTrack failed', e);
+      }
+    }
+    this._sendState();
+    this.emit('local-media');
+  }
+
+  _sendState() {
+    this._send({ t: 'state', mic: this.sendingAudio, cam: this.sendingVideo });
+  }
+
+  setMic(on) {
+    this.micOn = !!on;
+    const t = this.audioTrack;
+    if (t) t.enabled = this.micOn;
+    this._sendState();
+    this.emit('local-media');
+  }
+
+  async setCamera(on, { allowUnverified = false } = {}) {
+    if (this._ended) return { ok: false };
+    if (allowUnverified) this.allowUnverifiedVideo = true;
+    if (on) {
+      if (!this.videoTrack) {
+        const r = await openCamera();
+        if (this._ended) {
+          if (r.ok) r.track.stop();
+          return { ok: false };
+        }
+        if (!r.ok) return r;
+        this.localStream.addTrack(r.track);
+      }
+      this.cameraOn = true;
+    } else {
+      this.cameraOn = false;
+      const t = this.videoTrack;
+      if (t) {
+        // Stop the device (camera light goes off), not just disable the track.
+        if (this.videoTx) {
+          try {
+            await this.videoTx.sender.replaceTrack(null);
+          } catch {
+            /* ignore */
+          }
+        }
+        t.stop();
+        this.localStream.removeTrack(t);
+      }
+    }
+    await this._syncVideoSender();
+    return { ok: true };
+  }
+
+  // ---------- statistics ----------
+  async _sampleStats() {
+    if (this._ended || !this.pc) return;
+    let report;
+    try {
+      report = await this.pc.getStats();
+    } catch {
+      return;
+    }
+    if (this._ended) return;
+    let transport = null;
+    let pair = null;
+    const s = { at: Date.now() };
+    report.forEach((r) => {
+      if (r.type === 'transport' && !transport) transport = r;
+      if (r.type === 'candidate-pair' && (r.selected || (r.nominated && r.state === 'succeeded')) && !pair) pair = r;
+      if (r.type === 'inbound-rtp' && r.kind === 'audio') s.inAudio = r;
+      if (r.type === 'inbound-rtp' && r.kind === 'video') s.inVideo = r;
+      if (r.type === 'outbound-rtp' && r.kind === 'video') s.outVideo = r;
+      if (r.type === 'outbound-rtp' && r.kind === 'audio') s.outAudio = r;
+    });
+    if (transport && transport.selectedCandidatePairId) pair = report.get(transport.selectedCandidatePairId) || pair;
+    const summary = {
+      rtt: pair && typeof pair.currentRoundTripTime === 'number' ? pair.currentRoundTripTime : null,
+      outgoingBitrate: pair && pair.availableOutgoingBitrate ? pair.availableOutgoingBitrate : null,
+      path: null,
+      protocol: null,
+      loss: null,
+      srtpCipher: transport ? transport.srtpCipher || null : null,
+      dtlsCipher: transport ? transport.dtlsCipher || null : null,
+      tlsVersion: transport ? transport.tlsVersion || null : null,
+      inVideo: null,
+      outVideo: null,
+      audioBytesReceived: s.inAudio ? s.inAudio.bytesReceived || 0 : 0,
+      audioBytesSent: s.outAudio ? s.outAudio.bytesSent || 0 : 0,
+      videoFramesDecoded: s.inVideo ? s.inVideo.framesDecoded || 0 : 0,
+      videoFramesSent: s.outVideo ? s.outVideo.framesSent || s.outVideo.framesEncoded || 0 : 0,
+    };
+    if (pair) {
+      const lc = report.get(pair.localCandidateId);
+      const rc = report.get(pair.remoteCandidateId);
+      if (lc && rc) {
+        summary.path = lc.candidateType === 'relay' || rc.candidateType === 'relay' ? 'relay' : 'direct';
+        summary.protocol = (lc.relayProtocol || lc.protocol || '').toLowerCase();
+        summary.localType = lc.candidateType;
+        summary.remoteType = rc.candidateType;
+      }
+    }
+    if (s.inAudio) {
+      // Receive-side audio buffering over the last interval (jitter buffer).
+      const jbDelay = s.inAudio.jitterBufferDelay;
+      const jbCount = s.inAudio.jitterBufferEmittedCount;
+      if (typeof jbDelay === 'number' && typeof jbCount === 'number') {
+        const prev = this._prevJb;
+        if (prev && jbCount > prev.count) summary.audioBufferMs = (1000 * (jbDelay - prev.delay)) / (jbCount - prev.count);
+        this._prevJb = { delay: jbDelay, count: jbCount };
+      }
+      const codec = s.inAudio.codecId ? report.get(s.inAudio.codecId) : null;
+      if (codec && codec.mimeType) summary.audioCodec = codec.mimeType.replace(/^audio\//i, '');
+      const lost = s.inAudio.packetsLost || 0;
+      const recv = s.inAudio.packetsReceived || 0;
+      if (this._prevLoss) {
+        const dl = lost - this._prevLoss.lost;
+        const dr = recv - this._prevLoss.recv;
+        summary.loss = dl + dr > 0 ? Math.max(0, dl) / (Math.max(0, dl) + dr) : 0;
+      }
+      this._prevLoss = { lost, recv };
+    }
+    if (s.inVideo && s.inVideo.frameHeight) {
+      summary.inVideo = { w: s.inVideo.frameWidth, h: s.inVideo.frameHeight, fps: s.inVideo.framesPerSecond || null };
+    }
+    if (s.outVideo && s.outVideo.frameHeight && this.sendingVideo) {
+      summary.outVideo = {
+        w: s.outVideo.frameWidth,
+        h: s.outVideo.frameHeight,
+        fps: s.outVideo.framesPerSecond || null,
+        limit: s.outVideo.qualityLimitationReason || null,
+      };
+    }
+    summary.quality = rateQuality(summary.rtt, summary.loss);
+    this.lastStats = summary;
+    this.emit('stats', summary);
+  }
+
+  diagnostics() {
+    return {
+      local: this.localSummary || summarizeCandidates([]),
+      remote: summarizeCandidates(this.remoteCandidates),
+      candidateErrors: this.candidateErrors.slice(),
+      iceState: this.pc ? this.pc.iceConnectionState : 'closed',
+      relayOnly: this.iceConfig.iceTransportPolicy === 'relay',
+    };
+  }
+
+  // ---------- teardown ----------
+  end(reason, detail = {}) {
+    if (this._ended) return;
+    this._ended = true;
+    const duration = this.connectedAt ? Date.now() - this.connectedAt : 0;
+    const diagnostics = this.diagnostics();
+    const tellRemote = ['local-hangup', 'code-mismatch', 'page-closed', 'security-failed'];
+    if (tellRemote.includes(reason)) this._send({ t: 'bye' });
+    for (const id of this._timers) {
+      clearTimeout(id);
+      clearInterval(id);
+    }
+    this._timers.clear();
+    if (this.dc) {
+      this.dc.onopen = this.dc.onmessage = this.dc.onclose = null;
+      try {
+        this.dc.close();
+      } catch {
+        /* ignore */
+      }
+    }
+    if (this.pc) {
+      const pc = this.pc;
+      pc.onicecandidate = pc.onicecandidateerror = pc.onconnectionstatechange = pc.oniceconnectionstatechange = null;
+      try {
+        pc.close();
+      } catch {
+        /* ignore */
+      }
+    }
+    stopStream(this.localStream);
+    stopStream(this.remoteAudioStream);
+    stopStream(this.remoteVideoStream);
+    wipe(this.nonceA);
+    wipe(this.nonceB);
+    wipe(this.sid);
+    this.nonceA = this.nonceB = this.commit = null;
+    this.sas = null;
+    this._cert = null;
+    this.dc = null;
+    this.pc = null;
+    this.state = 'ended';
+    this.emit('ended', { reason, detail, duration, diagnostics });
+  }
+}
+
+function rateQuality(rtt, loss) {
+  if (rtt == null && loss == null) return 'unknown';
+  const r = rtt == null ? 0 : rtt;
+  const l = loss == null ? 0 : loss;
+  if (r < 0.3 && l < 0.02) return 'good';
+  if (r < 0.6 && l < 0.08) return 'fair';
+  return 'poor';
+}
+
+// ---- i18n.js ----
+// Interface text. Every user-visible string lives here so a translation (for
+// example Persian, right-to-left) is a new entry in LOCALES, not a code change.
+// Placeholders use {name}. Keep security wording precise when translating.
+
+const EN = {
+  'app.name': 'PrivateCall',
+  'app.noscript': 'PrivateCall needs JavaScript to run. Open this file in a current version of Chrome, Edge or Firefox.',
+
+  'top.settings': 'Connection settings',
+  'top.about': 'Privacy and safety',
+
+  'welcome.title': 'Private voice and video calls',
+  'welcome.lead': 'Calls go directly between two computers and are encrypted. No account is needed and nothing is stored.',
+  'welcome.start': 'Start a call',
+  'welcome.join': 'Join a call',
+  'welcome.howTitle': 'How it works',
+  'welcome.how1': 'One person clicks Start a call and sends the invitation to the other, using any app.',
+  'welcome.how2': 'The other person clicks Join a call, pastes the invitation, and sends back the reply.',
+  'welcome.how3': 'When the call connects, you check a short security code together.',
+  'welcome.unsupported': 'This browser can’t make calls with PrivateCall. Open this file in a current version of Chrome, Edge or Firefox.',
+
+  'common.cancel': 'Cancel',
+  'common.back': 'Back',
+  'common.tryAgain': 'Try again',
+  'common.close': 'Close',
+  'common.copy': 'Copy',
+  'common.copied': 'Copied',
+  'common.save': 'Save as file',
+  'common.paste': 'Paste',
+  'common.openFile': 'Open file',
+  'common.or': 'or',
+
+  'start.title': 'Start a call',
+  'start.typeQuestion': 'What kind of call?',
+  'start.video': 'Video call',
+  'start.audio': 'Voice call',
+  'start.step1': 'Send this invitation',
+  'start.step1Hint': 'Copy it and send it to the other person in any app you trust. It can be used only once.',
+  'start.preparing': 'Preparing your invitation…',
+  'start.preparingSlow': 'Checking which network routes work. On some networks this takes up to 30 seconds.',
+  'start.media': 'Waiting for camera and microphone permission…',
+  'start.mediaAudio': 'Waiting for microphone permission…',
+  'start.step2': 'Add their reply',
+  'start.step2Hint': 'Paste their reply here, or drop the reply file onto this window.',
+  'start.step3': 'Check the security code',
+  'start.step3Hint': 'When the call connects, you check a 6-digit code together before talking.',
+  'start.replyPlaceholder': 'Paste the reply here',
+  'start.waitingReply': 'Keep this window open until they reply.',
+
+  'join.title': 'Join a call',
+  'join.step1': 'Add the invitation',
+  'join.step1Hint': 'Paste the whole message you received, or drop the invitation file onto this window.',
+  'join.invitePlaceholder': 'Paste the invitation here',
+  'join.summaryVideo': 'Video call invitation',
+  'join.summaryAudio': 'Voice call invitation',
+  'join.madeAgo': 'Created {ago}.',
+  'join.oldWarning': 'This invitation is {ago} old. If connecting fails, ask for a new one.',
+  'join.clockWarning': 'This invitation seems to come from the future. One of your computer clocks may be wrong; this is usually harmless.',
+  'join.withCamera': 'Join with camera',
+  'join.withMic': 'Join with microphone only',
+  'join.withMicVoice': 'Join the voice call',
+  'join.step2': 'Send this reply back',
+  'join.step2Hint': 'Copy it and send it back to the person who invited you.',
+  'join.preparing': 'Preparing your reply…',
+  'join.waiting': 'Waiting for them to add your reply. The call starts automatically.',
+  'join.pathTrouble': 'Still not connected after 15 minutes. If they haven’t added your reply, start over with a new invitation.',
+  'join.step3': 'Check the security code',
+
+  'ago.justNow': 'just now',
+  'ago.minutes': '{n} min ago',
+  'ago.hours': '{n} h ago',
+  'ago.days': '{n} days ago',
+  'age.hours': '{n} hours',
+  'age.days': '{n} days',
+
+  'invite.intro': 'Join my private call: open PrivateCall, choose “Join a call”, and paste this whole message.',
+  'reply.intro': 'Here’s my reply: paste this whole message into PrivateCall on the computer that started the call.',
+  'invite.filename': 'PrivateCall-invitation.txt',
+  'reply.filename': 'PrivateCall-reply.txt',
+  'invite.copied': 'Invitation copied. Paste it into a message to the other person.',
+  'reply.copied': 'Reply copied. Paste it into a message back to them.',
+  'copy.manual': 'Couldn’t copy automatically. Select the text and press Ctrl+C.',
+  'paste.manual': 'Click in the box and press Ctrl+V to paste.',
+  'file.tooLarge': 'That file is too large to be an invitation or reply.',
+  'file.unreadable': 'That file couldn’t be read. Try copying and pasting the text instead.',
+  'saved': 'Check your downloads for {name}, then send it to the other person as an attachment.',
+
+  'err.empty': 'Paste the message first.',
+  'err.not-found': 'This doesn’t look like a PrivateCall message. Make sure you copied the whole message.',
+  'err.incomplete': 'Part of the message is missing. Copy everything from “PrivateCall.” to “:end”, or ask for it as a file.',
+  'err.corrupt': 'This message was damaged or changed on the way. Ask for a new one, ideally sent as a file.',
+  'err.multiple': 'There’s more than one PrivateCall message here. Paste just one.',
+  'err.too-large': 'This is too large to be a PrivateCall message.',
+  'err.version-newer': 'This was made with a newer version of PrivateCall. You both need the same version.',
+  'err.version-older': 'This was made with an older version of PrivateCall. You both need the same version.',
+  'err.browser-unsupported': 'This browser can’t read PrivateCall messages. Use a current Chrome, Edge or Firefox.',
+  'err.is-relay-code': 'That’s a relay code, not an invitation. Add it in Connection settings instead.',
+  'err.invalid': 'This message isn’t valid. It may have been changed on the way, or made by a different program.',
+  'err.wrong-kind-reply': 'This is a reply, not an invitation. Paste it on the computer that started the call.',
+  'err.wrong-kind-invite': 'This is an invitation, not a reply. You need the reply the other person sends back.',
+  'err.replay': 'This invitation was already used. Ask for a new one.',
+  'err.reply-mismatch': 'This reply is for a different invitation. Make sure they answered the invitation you just sent.',
+  'err.reply-unexpected': 'A reply was already added for this call.',
+  'err.reply-invalid': 'Your browser rejected this reply. Start a new call.',
+  'err.internal': 'Something went wrong while preparing the call. Start again.',
+  'err.no-network': 'Your computer didn’t find any network connection to offer. Check that you’re online, then try again.',
+  'err.relay-unreachable': 'The relay server couldn’t be reached. Check the relay code, or turn off “Always use the relay” in Connection settings.',
+
+  'media.permission-denied': 'PrivateCall wasn’t allowed to use your microphone or camera. Allow access using the icon in the address bar, then try again.',
+  'media.not-found': 'No microphone was found. Connect one and try again.',
+  'media.in-use': 'Your microphone or camera is being used by another app. Close that app and try again.',
+  'media.unknown': 'Your microphone or camera couldn’t be started. Check your devices and try again.',
+  'media.camera-missing': 'No camera was found, so this will be a voice call.',
+  'media.camera-busy': 'Your camera is being used by another app, so this will be a voice call. You can turn it on later.',
+  'media.cameraFailed': 'Your camera couldn’t be started.',
+
+  'preview.micCheck': 'Microphone level',
+  'preview.cameraOff': 'Camera off',
+
+  'call.connecting': 'Connecting…',
+  'call.statusChecking': 'Encrypted · checking the code',
+  'call.statusUnverified': 'Encrypted · not verified',
+  'call.statusVerified': 'Encrypted · verified',
+  'call.statusTip': 'Encrypted means outsiders can’t listen. Verified means you confirmed the same code as the other person, so no one is in the middle.',
+  'call.verifyTitle': 'Check the security code',
+  'call.speak': 'Turn on microphone',
+  'call.speaking': 'Microphone on ({time}) – click to turn off',
+  'call.remoteMicOn': 'Their microphone is on.',
+  'call.remoteMicOff': 'Their microphone is not on yet.',
+  'call.privateUntilConfirm': 'Until you click “Codes match”, the other person can’t see you, and can hear you only while your microphone is turned on here.',
+  'call.copyCode': 'Copy code',
+  'call.codeCopied': 'Code copied. Send it through a different app than the invitation.',
+  'call.talkUnverified': 'Talk without checking',
+  'call.talkConfirmTitle': 'Talk before checking the code?',
+  'call.talkConfirmBody': 'Until you compare the security code, you can’t be sure no one is listening in the middle. Everything you say could be heard by them.',
+  'call.talkConfirmYes': 'Talk now',
+  'call.talkingUnverified': 'You chose to talk before checking. The call may not be private.',
+  'call.verifyWaiting': 'Getting the security code…',
+  'call.match': 'Codes match',
+  'call.noMatch': 'Codes don’t match',
+  'call.later': 'Check later',
+  'call.remoteConfirmed': 'The other person has confirmed the code.',
+  'call.verifiedToast': 'Verified. You confirmed the codes match.',
+  'call.verifyAgain': 'Check code',
+  'call.unstable': 'Connection unstable. Trying to recover…',
+  'call.stable': 'Connection recovered.',
+  'call.remoteMuted': 'Their microphone is off',
+  'call.remoteNoVideo': 'Their camera is off',
+  'call.voiceCall': 'Voice call',
+  'call.other': 'Other person',
+  'call.youNotShared': 'Not sent yet',
+  'call.controls': 'Call controls',
+  'call.micLabel': 'Microphone',
+  'call.camLabel': 'Camera',
+  'call.mute': 'Turn off microphone',
+  'call.unmute': 'Turn on microphone',
+  'call.camOff': 'Turn camera off',
+  'call.camOn': 'Turn camera on',
+  'call.hangup': 'Leave',
+  'call.details': 'Details',
+  'call.enableSound': 'Click to turn on sound',
+  'call.quality.good': 'Connection: good',
+  'call.quality.fair': 'Connection: fair',
+  'call.quality.poor': 'Connection: poor',
+  'call.quality.unknown': '',
+  'call.camConfirmTitle': 'Share your camera before checking the code?',
+  'call.camConfirmBody': 'Until you compare the security code, you can’t be sure the call isn’t intercepted. Your video would be visible to anyone in the middle.',
+  'call.camConfirmYes': 'Share camera now',
+  'call.camConfirmNo': 'Wait',
+
+  'details.title': 'Connection details',
+  'details.path': 'Route',
+  'details.pathDirect': 'Direct between your computers',
+  'details.pathRelay': 'Through a relay server',
+  'details.pathUnknown': 'Not known yet',
+  'details.pathNote': 'On a direct route, each of you can see the other’s internet address. A relay hides it but sees that you’re talking.',
+  'details.encryption': 'Encryption',
+  'details.certs': 'Certificate check',
+  'details.certs.matched': 'Matches the security code',
+  'details.certs.unavailable': 'Not reported by this browser',
+  'details.certs.pending': 'Checking…',
+  'details.rtt': 'Round-trip time',
+  'details.loss': 'Audio packet loss',
+  'details.sending': 'Video you send',
+  'details.receiving': 'Video you receive',
+  'details.none': 'None',
+  'details.limited': 'reduced by {reason}',
+  'details.reason.bandwidth': 'connection speed',
+  'details.reason.cpu': 'computer load',
+  'details.reason.other': 'browser',
+  'details.yourFp': 'Your certificate',
+  'details.theirFp': 'Their certificate',
+
+  'ended.title.local-hangup': 'Call ended',
+  'ended.body.local-hangup': 'You left the call.',
+  'ended.title.remote-hangup': 'Call ended',
+  'ended.body.remote-hangup': 'The other person left the call.',
+  'ended.title.connection-lost': 'Connection lost',
+  'ended.body.connection-lost': 'The connection dropped and didn’t recover. To talk again, start a new call and exchange a new invitation.',
+  'ended.title.connect-failed': 'Couldn’t connect',
+  'ended.body.connect-failed': 'Your computers couldn’t find a way to reach each other. This happens on some office, school, mobile and restricted networks.',
+  'ended.title.code-mismatch': 'Call ended for your safety',
+  'ended.body.code-mismatch': 'The security codes didn’t match, so someone may have intercepted the invitation or reply. Don’t continue on this connection. Start a new call, send the invitation through a different app if you can, and compare the code again.',
+  'ended.title.security-failed': 'Security check failed',
+  'ended.body.security-failed': 'The connection didn’t pass PrivateCall’s security check, so it was ended. Start a new call. If this keeps happening, someone may be interfering.',
+  'ended.title.internal': 'Something went wrong',
+  'ended.body.internal': 'The call couldn’t be set up. Start again.',
+  'ended.title.cancelled': 'Call cancelled',
+  'ended.body.cancelled': 'Nothing was sent.',
+  'ended.duration': 'Call length {time}.',
+  'ended.newCall': 'Start a new call',
+  'ended.joinCall': 'Join a call',
+  'ended.home': 'Back to start',
+  'ended.tipsTitle': 'Things to try',
+  'ended.tip1': 'Exchange a new invitation and reply quickly, within a few minutes.',
+  'ended.tip2': 'Try a different network for one of you, such as a phone hotspot or home Wi‑Fi.',
+  'ended.tip3': 'If it keeps failing, one of you can add a relay code in Connection settings.',
+  'ended.diag': 'What your computer found: {items}.',
+  'ended.diag.local': 'local network address',
+  'ended.diag.public': 'public address',
+  'ended.diag.relay': 'relay',
+  'ended.diag.nothing': 'no usable network address',
+  'ended.diag.stunFailed': 'The public helper servers couldn’t be reached from your network.',
+
+  'settings.title': 'Connection settings',
+  'settings.intro': 'Most people never need to change these. Settings last only while this window is open.',
+  'settings.stun': 'Use public helper servers to find a route',
+  'settings.stunHint': 'Recommended. Google and Cloudflare servers tell your computer its public address. They can’t hear the call, but they learn that your address is starting one.',
+  'settings.relayTitle': 'Relay server (optional)',
+  'settings.relayHint': 'If calls can’t connect, a relay can pass the encrypted call along. Only one of you needs it. Paste a relay code from someone you trust who runs one.',
+  'settings.relayPlaceholder': 'PCRELAY1:…',
+  'settings.relayAdd': 'Use this relay',
+  'settings.relayRemove': 'Remove relay',
+  'settings.relayActive': 'Relay added{label}. Valid until {until}.',
+  'settings.relayOnly': 'Always use the relay (hides your internet address from the other person)',
+  'settings.relayOnlyHint': 'Calls may be slower. The relay operator can see your address and when you talk, but not what you say.',
+  'settings.appliesNext': 'Changes apply to your next call.',
+  'settings.done': 'Done',
+  'err.relay-invalid': 'That relay code isn’t valid. Check you copied all of it.',
+  'err.relay-expired': 'That relay code has expired. Ask for a new one.',
+
+  'about.title': 'Privacy and safety',
+  'about.p1': 'Calls are encrypted with the same standard technology browsers use for all video calls (DTLS-SRTP). The audio and video travel directly between the two computers whenever possible. Nothing is uploaded, recorded or stored by PrivateCall.',
+  'about.h2': 'Why compare the code?',
+  'about.p2': 'Encryption stops outsiders from listening, but someone who intercepted your invitation could try to sit in the middle of the call. The 6-digit code reveals this: if anyone is in the middle, your codes will be different. Until you confirm the code, nothing from your microphone or camera is sent, except while you turn the microphone on to read the code. Reading the code aloud is convenient, but a skilled attacker can imitate voices; comparing it by text in a different app you trust is stronger. The code doesn’t prove who the other person is.',
+  'about.h3': 'What others can see',
+  'about.li1': 'The other person can see your internet address on a direct connection.',
+  'about.li2': 'The app you use to send the invitation can see that you’re setting up a call, when, and your network addresses.',
+  'about.li3': 'Helper servers (Google, Cloudflare) and any relay learn that your address is making a call, but not what is said.',
+  'about.li4': 'Your internet provider can see that you’re making an encrypted call, but not its content.',
+  'about.h4': 'Limits',
+  'about.p4': 'PrivateCall can’t protect a call if either computer is infected with spyware, or if the other person records it. Get this file only from someone you trust, and compare its checksum if they gave you one.',
+  'call.stepSay': 'Turn on your microphone and say:',
+  'call.stepHear': 'Listen. The other person should say:',
+  'call.stepConfirm': 'If everything matches your screen, click “Codes match”.',
+  'call.strongShort': 'For a stronger check, compare the code in a different app you trust.',
+  'call.micNotSent': 'Microphone not sent',
+  'preview.noCamera': 'No camera',
+  'details.audioBuffer': 'Audio buffering',
+  'details.audioCodec': 'Audio',
+  'details.latencyNote': 'If the call feels delayed: a high round-trip time or a relay route points to the network; high audio buffering points to an unsteady connection; if both are low, check for Bluetooth headsets or other audio devices.',
+};
+
+const LOCALES = {
+  en: { name: 'English', dir: 'ltr', strings: EN },
+};
+
+let current = 'en';
+
+function setLocale(code) {
+  if (LOCALES[code]) current = code;
+  const doc = globalThis.document;
+  if (doc) {
+    doc.documentElement.lang = code;
+    doc.documentElement.dir = LOCALES[current].dir;
+  }
+}
+
+function getLocale() {
+  return current;
+}
+
+function t(key, vars) {
+  const table = LOCALES[current].strings;
+  let s = Object.prototype.hasOwnProperty.call(table, key) ? table[key] : EN[key];
+  if (s === undefined) s = key;
+  if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? String(vars[k]) : m));
+  return s;
+}
+
+// Digits in the user's numbering system (e.g. Persian digits for "fa").
+function localDigits(str) {
+  let fmt;
+  try {
+    fmt = new Intl.NumberFormat(current, { useGrouping: false });
+  } catch {
+    return str;
+  }
+  return String(str).replace(/\d/g, (d) => fmt.format(Number(d)));
+}
+
+// Apply translations to static markup: data-i18n (text), data-i18n-aria (aria-label),
+// data-i18n-title (title), data-i18n-placeholder (placeholder).
+function translateDom(root) {
+  for (const el of root.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);
+  for (const el of root.querySelectorAll('[data-i18n-aria]')) el.setAttribute('aria-label', t(el.dataset.i18nAria));
+  for (const el of root.querySelectorAll('[data-i18n-title]')) el.setAttribute('title', t(el.dataset.i18nTitle));
+  for (const el of root.querySelectorAll('[data-i18n-placeholder]')) el.setAttribute('placeholder', t(el.dataset.i18nPlaceholder));
+}
+
+// ---- main.js ----
+// UI controller: screens, inputs, and the bridge to CallSession.
+// All text is set with textContent; no HTML strings are ever built from data.
+
+
+
+
+
+
+
+
+const $ = (id) => document.getElementById(id);
+
+const settings = { useStun: true, relay: null, relayOnly: false };
+const ui = {
+  session: null,
+  flow: null, // 'start' | 'join'
+  invite: null, // parsed invitation (join flow)
+  localMeter: null,
+  callTimer: 0,
+  toastTimer: 0,
+  verifyHidden: false,
+  fileTarget: null,
+};
+
+const ACTIVE_STATES = new Set(['preparing', 'awaiting-reply', 'reply-ready', 'connecting', 'connected']);
+
+// ---------------------------------------------------------------- helpers
+function show(el, on = true) {
+  (typeof el === 'string' ? $(el) : el).hidden = !on;
+}
+
+function setText(id, text) {
+  $(id).textContent = text;
+}
+
+function setIcon(useId, name) {
+  $(useId).setAttribute('href', '#i-' + name);
+}
+
+function toast(text, ms = 4000) {
+  const el = $('toast');
+  el.textContent = text;
+  el.hidden = false;
+  clearTimeout(ui.toastTimer);
+  ui.toastTimer = setTimeout(() => {
+    el.hidden = true;
+  }, ms);
+}
+
+function showScreen(name) {
+  for (const s of document.querySelectorAll('.screen')) s.hidden = s.id !== 'screen-' + name;
+  const heading = document.querySelector('#screen-' + name + ' h1');
+  if (heading) {
+    if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
+    heading.focus({ preventScroll: true });
+  }
+  window.scrollTo(0, 0);
+}
+
+function currentScreen() {
+  const s = document.querySelector('.screen:not([hidden])');
+  return s ? s.id.replace('screen-', '') : null;
+}
+
+function errorText(code) {
+  const key = 'err.' + code;
+  const s = t(key);
+  return s === key ? t('err.invalid') : s;
+}
+
+function fieldError(id, text) {
+  const el = $(id);
+  el.textContent = text || '';
+  el.hidden = !text;
+}
+
+function formatAgo(seconds) {
+  if (seconds < 90) return t('ago.justNow');
+  if (seconds < 3600) return t('ago.minutes', { n: localDigits(Math.round(seconds / 60)) });
+  if (seconds < 86400 * 2) return t('ago.hours', { n: localDigits(Math.round(seconds / 3600)) });
+  return t('ago.days', { n: localDigits(Math.round(seconds / 86400)) });
+}
+
+function formatAge(seconds) {
+  if (seconds < 86400 * 2) return t('age.hours', { n: localDigits(Math.max(1, Math.round(seconds / 3600))) });
+  return t('age.days', { n: localDigits(Math.round(seconds / 86400)) });
+}
+
+function formatDuration(ms) {
+  const total = Math.floor(ms / 1000);
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const pad = (n) => String(n).padStart(2, '0');
+  return localDigits(h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`);
+}
+
+async function copyText(text, textarea, okMessage) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast(okMessage);
+    return true;
+  } catch {
+    /* fall back below */
+  }
+  textarea.focus();
+  textarea.select();
+  try {
+    if (document.execCommand('copy')) {
+      toast(okMessage);
+      return true;
+    }
+  } catch {
+    /* ignore */
+  }
+  toast(t('copy.manual'), 6000);
+  return false;
+}
+
+function saveText(text, filename) {
+  const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 15000);
+  toast(t('saved', { name: filename }), 6000);
+}
+
+async function readDroppedFile(file) {
+  if (!file) return null;
+  if (file.size > LIMITS.file) {
+    toast(t('file.tooLarge'));
+    return null;
+  }
+  try {
+    return await file.text();
+  } catch {
+    toast(t('file.unreadable'));
+    return null;
+  }
+}
+
+// Paste box with Paste / Open file buttons and drag-and-drop.
+function wireInput({ textarea, pasteBtn, fileBtn, dropzone, onText }) {
+  let debounce = 0;
+  const submit = (text) => {
+    clearTimeout(debounce);
+    onText(text);
+  };
+  textarea.addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => onText(textarea.value), 250);
+  });
+  pasteBtn.addEventListener('click', async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      textarea.value = text;
+      submit(text);
+    } catch {
+      textarea.focus();
+      toast(t('paste.manual'));
+    }
+  });
+  fileBtn.addEventListener('click', () => {
+    ui.fileTarget = async (file) => {
+      const text = await readDroppedFile(file);
+      if (text !== null) {
+        textarea.value = text;
+        submit(text);
+      }
+    };
+    $('file-input').value = '';
+    $('file-input').click();
+  });
+  const over = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.classList.add('is-over');
+  };
+  dropzone.addEventListener('dragenter', over);
+  dropzone.addEventListener('dragover', over);
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('is-over'));
+  dropzone.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.classList.remove('is-over');
+    await handleDrop(e.dataTransfer, textarea, submit);
+  });
+}
+
+async function handleDrop(dt, textarea, submit) {
+  if (!dt) return;
+  let text = null;
+  if (dt.files && dt.files.length > 0) text = await readDroppedFile(dt.files[0]);
+  else text = dt.getData('text/plain') || null;
+  if (text !== null) {
+    textarea.value = text;
+    submit(text);
+  }
+}
+
+// ---------------------------------------------------------------- session
+function newSession(role) {
+  const s = new CallSession({ role, iceConfig: buildIceConfig(settings), emit: onSessionEvent });
+  ui.session = s;
+  return s;
+}
+
+function sessionActive() {
+  return ui.session && ACTIVE_STATES.has(ui.session.state);
+}
+
+function onSessionEvent(type, data, s) {
+  if (s !== ui.session) return; // events from a finished session
+  switch (type) {
+    case 'local-media':
+      renderLocalMedia();
+      break;
+    case 'remote-media':
+      attachRemote();
+      break;
+    case 'connected':
+      enterCall(true);
+      break;
+    case 'sas':
+      renderVerify();
+      break;
+    case 'verified':
+      renderSecurity();
+      renderVerify();
+      renderLocalMedia();
+      toast(t('call.verifiedToast'));
+      break;
+    case 'remote-confirmed':
+      renderVerify();
+      break;
+    case 'remote-state':
+      renderRemote();
+      renderVerify();
+      break;
+    case 'stats':
+      renderStats(data);
+      break;
+    case 'cert-check':
+      if ($('dlg-details').open) renderDetails();
+      break;
+    case 'unstable':
+      banner(t('call.unstable'));
+      break;
+    case 'stable':
+      banner(null);
+      toast(t('call.stable'));
+      break;
+    case 'gathering-slow':
+      setText(s.role === 'offerer' ? 'start-working-text' : 'join-working-text', t('start.preparingSlow'));
+      break;
+    case 'path-trouble':
+      setText('join-waiting-text', t('join.pathTrouble'));
+      break;
+    case 'ended':
+      onEnded(data);
+      break;
+    default:
+  }
+}
+
+// ---------------------------------------------------------------- preview & local media
+function mountPreview(sideId) {
+  const side = $(sideId);
+  side.appendChild($('preview'));
+  show('preview');
+  show(side);
+  renderLocalMedia();
+}
+
+function renderLocalMedia() {
+  const s = ui.session;
+  if (!s || !s.localStream) return;
+  const hasVideo = !!s.videoTrack;
+
+  // Setup preview
+  const pv = $('preview-video');
+  if (hasVideo) {
+    if (pv.srcObject !== s.localStream) pv.srcObject = s.localStream;
+    pv.play().catch(() => {});
+  } else {
+    pv.srcObject = null;
+  }
+  show(pv, hasVideo);
+  show('preview-off', !hasVideo);
+  setText('preview-cam-label', s.cameraOn ? t('call.camOff') : t('call.camOn'));
+
+  // In-call self view
+  const sv = $('self-video');
+  if (hasVideo) {
+    if (sv.srcObject !== s.localStream) sv.srcObject = s.localStream;
+    sv.play().catch(() => {});
+  } else {
+    sv.srcObject = null;
+  }
+  show(sv, hasVideo);
+  show('self-off', !hasVideo);
+  show('self-badge', hasVideo && s.state === 'connected' && !s.sendingVideo);
+  show('self-muted', s.state === 'connected' ? !s.sendingAudio : !s.micOn);
+  setPressed($('ctl-mic'), s.micOn, 'mic');
+  setIcon('ctl-mic-icon', s.micOn ? 'mic' : 'mic-off');
+  setPressed($('ctl-cam'), s.cameraOn, 'cam');
+  setIcon('ctl-cam-icon', s.cameraOn ? 'cam' : 'cam-off');
+
+  if (!ui.localMeter) {
+    ui.localMeter = createLevelMeter(s.localStream, (level) => {
+      const v = ui.session && ui.session.micOn ? level : 0;
+      $('meter-fill').style.transform = `scaleX(${v.toFixed(3)})`;
+    });
+  }
+  renderVerify();
+}
+
+function setPressed(btn, on, kind) {
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  const label = kind === 'mic' ? t('call.micLabel') : t('call.camLabel');
+  const action = kind === 'mic' ? (on ? t('call.mute') : t('call.unmute')) : on ? t('call.camOff') : t('call.camOn');
+  btn.setAttribute('aria-label', label);
+  btn.title = action + (btn.id.startsWith('ctl-') ? ` (${kind === 'mic' ? 'M' : 'V'})` : '');
+}
+
+function toggleMic() {
+  const s = ui.session;
+  if (!s || !s.localStream) return;
+  s.setMic(!s.micOn);
+}
+
+async function toggleCamera() {
+  const s = ui.session;
+  if (!s || !s.localStream) return;
+  const on = !s.cameraOn;
+  let opts = {};
+  if (on && s.state === 'connected' && !s.videoAllowed) {
+    const answer = await askDialog('dlg-cam');
+    if (answer === 'yes') opts = { allowUnverified: true };
+    else if (answer !== 'no') return;
+  }
+  const r = await s.setCamera(on, opts);
+  if (r && !r.ok && r.error) toast(t('media.cameraFailed') + ' ' + t('media.' + r.error));
+}
+
+function askDialog(id) {
+  const dlg = $(id);
+  return new Promise((resolve) => {
+    dlg.returnValue = '';
+    dlg.addEventListener('close', () => resolve(dlg.returnValue), { once: true });
+    dlg.showModal();
+  });
+}
+
+// ---------------------------------------------------------------- start flow
+function openStart() {
+  ui.flow = 'start';
+  resetSetupUi();
+  showScreen('start');
+}
+
+async function startCall(withVideo) {
+  show('start-media-error', false);
+  show('start-type', false);
+  show('start-steps');
+  show('start-foot');
+  setStep('start', 1);
+  show('start-working');
+  show('start-error', false);
+  setText('start-working-text', withVideo ? t('start.media') : t('start.mediaAudio'));
+
+  const s = newSession('offerer');
+  const m = await s.openMedia(withVideo);
+  if (s !== ui.session) return;
+  if (!m.ok) {
+    s.end('cancelled', { silent: true });
+    ui.session = null;
+    show('start-steps', false);
+    show('start-foot', false);
+    show('start-type');
+    fieldError('start-media-error', t('media.' + m.error));
+    return;
+  }
+  mountPreview('start-side');
+  if (m.notice) {
+    setText('preview-notice', t('media.' + m.notice));
+    show('preview-notice');
+  }
+  setText('start-working-text', t('start.preparing'));
+  let text;
+  try {
+    text = await s.createInvitation(t('invite.intro'));
+  } catch (e) {
+    if (s === ui.session) {
+      s.end('internal', { silent: true });
+      show('start-working', false);
+      fieldError('start-error', errorText(e.code || 'internal'));
+    }
+    return;
+  }
+  if (!text || s !== ui.session) return;
+  show('start-working', false);
+  $('invite-text').value = text;
+  show('invite-out');
+  show('reply-in-wrap');
+  setStep('start', 2, { keepPrevActive: true });
+  $('invite-copy').focus();
+}
+
+async function handleReplyText(text) {
+  const s = ui.session;
+  fieldError('reply-error', null);
+  if (!s || s.role !== 'offerer' || s.state !== 'awaiting-reply') return;
+  if (!text.trim()) return;
+  const r = await decodeEnvelope(text);
+  if (s !== ui.session) return;
+  if (!r.ok) return fieldError('reply-error', errorText(r.error));
+  if (r.kind === 'invite') return fieldError('reply-error', t('err.wrong-kind-invite'));
+  const rep = parseReply(r.payload);
+  if (!rep.ok) return fieldError('reply-error', t('err.invalid'));
+  const res = await s.acceptReply(rep);
+  if (s !== ui.session) return;
+  if (!res.ok) return fieldError('reply-error', errorText(res.error));
+  $('reply-text').readOnly = true;
+  setStep('start', 3);
+  enterCall(false);
+}
+
+// ---------------------------------------------------------------- join flow
+function openJoin() {
+  ui.flow = 'join';
+  resetSetupUi();
+  showScreen('join');
+}
+
+async function handleInviteText(text) {
+  fieldError('invite-error', null);
+  show('invite-summary', false);
+  ui.invite = null;
+  if (sessionActive()) return;
+  if (!text.trim()) return;
+  const r = await decodeEnvelope(text);
+  if (!r.ok) return fieldError('invite-error', errorText(r.error));
+  if (r.kind === 'reply') return fieldError('invite-error', t('err.wrong-kind-reply'));
+  const inv = parseInvite(r.payload);
+  if (!inv.ok) return fieldError('invite-error', t('err.invalid'));
+  if (inviteAlreadyUsed(inv.sidText)) return fieldError('invite-error', t('err.replay'));
+  ui.invite = inv;
+
+  const age = Math.floor(Date.now() / 1000) - inv.ts;
+  setText('invite-kind', inv.media === 'video' ? t('join.summaryVideo') : t('join.summaryAudio'));
+  setText('invite-age', age > -600 ? t('join.madeAgo', { ago: formatAgo(Math.max(0, age)) }) : '');
+  let warn = null;
+  if (age > 3600) warn = t('join.oldWarning', { ago: formatAge(age) });
+  else if (age < -600) warn = t('join.clockWarning');
+  setText('invite-warn', warn || '');
+  show('invite-warn', !!warn);
+  show('join-cam', inv.media === 'video');
+  setText('join-mic-label', inv.media === 'video' ? t('join.withMic') : t('join.withMicVoice'));
+  $('join-mic').classList.toggle('btn-primary', inv.media !== 'video');
+  show('invite-summary');
+  (inv.media === 'video' ? $('join-cam') : $('join-mic')).focus();
+}
+
+async function joinCall(withVideo) {
+  const inv = ui.invite;
+  if (!inv || sessionActive()) return;
+  $('invite-in').readOnly = true;
+  $('join-cam').disabled = $('join-mic').disabled = true;
+  show('join-actions', false);
+  show('join-step2-body');
+  show('join-foot');
+  show('join-working');
+  show('join-error', false);
+  setStep('join', 2);
+  setText('join-working-text', withVideo ? t('start.media') : t('start.mediaAudio'));
+
+  const s = newSession('answerer');
+  const m = await s.openMedia(withVideo);
+  if (s !== ui.session) return;
+  if (!m.ok) {
+    s.end('cancelled', { silent: true });
+    ui.session = null;
+    show('join-working', false);
+    fieldError('join-error', t('media.' + m.error));
+    $('invite-in').readOnly = false;
+    $('join-cam').disabled = $('join-mic').disabled = false;
+    show('join-actions');
+    setStep('join', 1);
+    return;
+  }
+  mountPreview('join-side');
+  if (m.notice) {
+    setText('preview-notice', t('media.' + m.notice));
+    show('preview-notice');
+  }
+  setText('join-working-text', t('join.preparing'));
+  let r;
+  try {
+    r = await s.acceptInvitation(inv, t('reply.intro'));
+  } catch (e) {
+    r = { ok: false, error: e.code || 'internal' };
+  }
+  if (r.error === 'cancelled') return; // the person cancelled meanwhile
+  if (!r.ok) {
+    // The session may already have ended itself (silently) on this error.
+    s.end('internal', { silent: true });
+    show('join-working', false);
+    fieldError('join-error', errorText(r.error));
+    return;
+  }
+  if (s !== ui.session) return;
+  show('join-working', false);
+  $('reply-out-text').value = r.text;
+  setText('join-waiting-text', t('join.waiting'));
+  show('reply-out');
+  $('reply-copy').focus();
+}
+
+// ---------------------------------------------------------------- steps
+function setStep(flow, active, { keepPrevActive = false } = {}) {
+  for (let i = 1; i <= 3; i++) {
+    const li = $(`${flow}-step${i}`);
+    li.classList.toggle('is-done', i < active && !(keepPrevActive && i === active - 1));
+    li.classList.toggle('is-active', i === active || (keepPrevActive && i === active - 1));
+    li.classList.toggle('is-pending', i > active);
+    if (i === active) li.setAttribute('aria-current', 'step');
+    else li.removeAttribute('aria-current');
+  }
+}
+
+function markDone(flow, step) {
+  const li = $(`${flow}-step${step}`);
+  li.classList.remove('is-active');
+  li.classList.add('is-done');
+}
+
+function resetSetupUi() {
+  // Start
+  show('start-type');
+  show('start-media-error', false);
+  show('start-steps', false);
+  show('start-foot', false);
+  show('start-side', false);
+  show('invite-out', false);
+  show('reply-in-wrap', false);
+  show('start-error', false);
+  $('invite-text').value = '';
+  $('reply-text').value = '';
+  $('reply-text').readOnly = false;
+  fieldError('reply-error', null);
+  // Join
+  $('invite-in').value = '';
+  $('invite-in').readOnly = false;
+  $('join-cam').disabled = $('join-mic').disabled = false;
+  show('join-actions');
+  fieldError('invite-error', null);
+  show('invite-summary', false);
+  show('join-step2-body', false);
+  show('join-foot', false);
+  show('join-side', false);
+  show('reply-out', false);
+  show('join-error', false);
+  $('reply-out-text').value = '';
+  setStep('join', 1);
+  ui.invite = null;
+  // Preview
+  show('preview', false);
+  show('preview-notice', false);
+  document.body.appendChild($('preview'));
+}
+
+// ---------------------------------------------------------------- call screen
+function enterCall(connected) {
+  const s = ui.session;
+  if (!s) return;
+  if (currentScreen() !== 'call') {
+    ui.verifyHidden = false;
+    showScreen('call');
+    attachRemote();
+  }
+  show('call-connecting', !connected);
+  if (connected) startTimer();
+  renderSecurity();
+  renderVerify();
+  renderRemote();
+  renderLocalMedia();
+}
+
+function attachRemote() {
+  const s = ui.session;
+  if (!s || !s.remoteAudioStream || currentScreen() !== 'call') return;
+  const v = $('remote-video');
+  const a = $('remote-audio');
+  if (v.srcObject !== s.remoteVideoStream) v.srcObject = s.remoteVideoStream;
+  if (a.srcObject !== s.remoteAudioStream) {
+    a.srcObject = s.remoteAudioStream;
+    a.play().then(
+      () => show('btn-enable-sound', false),
+      () => show('btn-enable-sound'),
+    );
+  }
+  v.play().catch(() => {});
+}
+
+function renderRemote() {
+  const s = ui.session;
+  if (!s) return;
+  const v = $('remote-video');
+  const showVideo = s.state === 'connected' && s.remoteState.cam && v.videoWidth > 0;
+  show(v, showVideo);
+  show('remote-placeholder', s.state === 'connected' && !showVideo);
+  const parts = [];
+  parts.push(s.mediaMode === 'audio' && !s.remoteState.cam ? t('call.voiceCall') : t('call.remoteNoVideo'));
+  if (!s.remoteState.mic) parts.push(t('call.remoteMuted'));
+  setText('remote-placeholder-text', parts.join(' · '));
+}
+
+function renderSecurity() {
+  const s = ui.session;
+  if (!s) return;
+  const chip = $('sec-chip');
+  const verified = s.verify === 'confirmed';
+  chip.classList.toggle('is-verified', verified);
+  setText('sec-chip-text', verified ? t('call.statusVerified') : s.sas ? t('call.statusUnverified') : t('call.statusChecking'));
+  chip.title = t('call.statusTip');
+}
+
+function renderVerify() {
+  const s = ui.session;
+  if (!s || currentScreen() !== 'call') return;
+  const visible = s.state === 'connected' && s.verify !== 'confirmed' && !ui.verifyHidden;
+  show('verify', visible);
+  renderSecurity();
+  if (!visible) return;
+  const code = $('verify-code');
+  // Rebuild the code only when it changes (it sits in a live region).
+  const key = s.sas || '';
+  if (code.dataset.key !== key) {
+    code.dataset.key = key;
+    code.replaceChildren();
+    if (s.sas) {
+      code.classList.remove('is-waiting');
+      for (const part of [s.sas.slice(0, 3), s.sas.slice(3)]) {
+        const span = document.createElement('span');
+        span.className = 'digit-group';
+        span.textContent = localDigits(part);
+        code.appendChild(span);
+      }
+      code.setAttribute('aria-label', s.sas.split('').join(' '));
+      // Each person reads one half, so both directions of speech are checked:
+      // the starter reads the first three digits, the joiner the last three.
+      const mine = s.role === 'offerer' ? s.sas.slice(0, 3) : s.sas.slice(3);
+      const theirs = s.role === 'offerer' ? s.sas.slice(3) : s.sas.slice(0, 3);
+      setDigitsText('verify-step-say', t('call.stepSay'), mine);
+      setDigitsText('verify-step-hear', t('call.stepHear'), theirs);
+    } else {
+      code.classList.add('is-waiting');
+      code.textContent = t('call.verifyWaiting');
+      code.removeAttribute('aria-label');
+    }
+  }
+  const ready = !!s.sas;
+  show('verify-body', ready);
+  show('verify-speak', ready && !s.allowUnverifiedAudio);
+  show('verify-strong', ready);
+  show('verify-private', ready && !s.allowUnverifiedAudio);
+  show($('btn-talk-unverified').parentElement, ready && !s.allowUnverifiedAudio);
+  for (const id of ['btn-match', 'btn-nomatch']) $(id).disabled = !ready;
+  renderSpeak();
+  setText('verify-remote-mic', s.remoteState.mic ? t('call.remoteMicOn') : t('call.remoteMicOff'));
+  show('verify-remote', s.remoteConfirmed);
+}
+
+// "Say: 482" with the digits in bold, built without HTML strings.
+function setDigitsText(id, label, digits) {
+  const el = $(id);
+  const strong = document.createElement('strong');
+  strong.textContent = localDigits(digits);
+  el.replaceChildren(document.createTextNode(label + ' '), strong);
+}
+
+function renderSpeak() {
+  const s = ui.session;
+  if (!s) return;
+  const btn = $('btn-speak');
+  btn.setAttribute('aria-pressed', s.speaking ? 'true' : 'false');
+  if (s.speaking) {
+    const left = Math.max(0, Math.ceil((s.speakUntil - Date.now()) / 1000));
+    setText('btn-speak-label', t('call.speaking', { time: formatDuration(left * 1000) }));
+  } else {
+    setText('btn-speak-label', t('call.speak'));
+    btn.title = '';
+  }
+}
+
+function startTimer() {
+  if (ui.callTimer) return;
+  const tick = () => {
+    const s = ui.session;
+    if (s && s.connectedAt) setText('call-timer', formatDuration(Date.now() - s.connectedAt));
+    if (s && s.speaking) renderSpeak();
+  };
+  tick();
+  ui.callTimer = setInterval(tick, 1000);
+}
+
+function banner(text) {
+  const el = $('call-banner');
+  el.textContent = text || '';
+  el.hidden = !text;
+}
+
+function renderStats(st) {
+  setText('quality', t('call.quality.' + st.quality));
+  renderRemote();
+  if ($('dlg-details').open) renderDetails();
+}
+
+function renderDetails() {
+  const s = ui.session;
+  const list = $('details-list');
+  list.replaceChildren();
+  if (!s) return;
+  const st = s.lastStats || {};
+  const row = (label, value, mono = false) => {
+    const dt = document.createElement('dt');
+    dt.textContent = label;
+    const dd = document.createElement('dd');
+    dd.textContent = value;
+    if (mono) dd.className = 'mono';
+    list.append(dt, dd);
+  };
+  const path = st.path === 'relay' ? t('details.pathRelay') : st.path === 'direct' ? t('details.pathDirect') : t('details.pathUnknown');
+  row(t('details.path'), path + (st.protocol ? ` (${st.protocol.toUpperCase()})` : ''));
+  const enc = ['DTLS-SRTP', st.srtpCipher, st.tlsVersion === 'FEFC' ? 'DTLS 1.3' : st.tlsVersion === 'FEFD' ? 'DTLS 1.2' : null].filter(Boolean).join(' · ');
+  row(t('details.encryption'), enc);
+  row(t('details.certs'), t('details.certs.' + (s.certCheck === 'mismatch' ? 'pending' : s.certCheck)));
+  row(t('details.rtt'), st.rtt != null ? localDigits(Math.round(st.rtt * 1000)) + ' ms' : '–');
+  row(t('details.loss'), st.loss != null ? localDigits((st.loss * 100).toFixed(1)) + '%' : '–');
+  row(t('details.audioBuffer'), st.audioBufferMs != null ? localDigits(Math.round(st.audioBufferMs)) + ' ms' : '–');
+  if (st.audioCodec) row(t('details.audioCodec'), st.audioCodec);
+  const vid = (v) => {
+    if (!v) return t('details.none');
+    let out = localDigits(`${v.w}×${v.h}`) + (v.fps ? ' · ' + localDigits(Math.round(v.fps)) + ' fps' : '');
+    if (v.limit && v.limit !== 'none') {
+      const reason = ['bandwidth', 'cpu'].includes(v.limit) ? t('details.reason.' + v.limit) : t('details.reason.other');
+      out += ', ' + t('details.limited', { reason });
+    }
+    return out;
+  };
+  row(t('details.sending'), vid(st.outVideo));
+  row(t('details.receiving'), vid(st.inVideo));
+  if (s.localFp) row(t('details.yourFp'), s.localFp.alg + ' ' + s.localFp.value, true);
+  if (s.remoteFp) row(t('details.theirFp'), s.remoteFp.alg + ' ' + s.remoteFp.value, true);
+  setText('details-latency', t('details.latencyNote'));
+}
+
+function hangup() {
+  if (ui.session) ui.session.end('local-hangup');
+}
+
+// ---------------------------------------------------------------- ended
+const DANGER = new Set(['code-mismatch', 'security-failed']);
+const WARN = new Set(['connect-failed', 'connection-lost']);
+
+function onEnded({ reason, duration, diagnostics, detail }) {
+  const flow = ui.flow;
+  const silent = !!(detail && detail.silent);
+  cleanupUi(!silent);
+  ui.session = null;
+  if (silent) return; // setup error is shown in place by the caller
+  if (reason === 'cancelled' || reason === 'page-closed') {
+    showScreen('welcome');
+    return;
+  }
+  const card = $('ended-card');
+  card.classList.toggle('is-danger', DANGER.has(reason));
+  card.classList.toggle('is-warn', WARN.has(reason));
+  const key = t('ended.title.' + reason) === 'ended.title.' + reason ? 'internal' : reason;
+  setText('ended-title', t('ended.title.' + key));
+  setText('ended-body', t('ended.body.' + key));
+  setText('ended-duration', duration > 0 ? t('ended.duration', { time: formatDuration(duration) }) : '');
+  show('ended-duration', duration > 0 && !DANGER.has(reason));
+  show('ended-tips', reason === 'connect-failed');
+  if (reason === 'connect-failed') setText('ended-diag', diagnosticsText(diagnostics));
+  setText('ended-again', flow === 'join' ? t('ended.joinCall') : t('ended.newCall'));
+  showScreen('ended');
+}
+
+function diagnosticsText(d) {
+  if (!d) return '';
+  const items = [];
+  if (d.local.host > 0) items.push(t('ended.diag.local'));
+  if (d.local.srflx > 0) items.push(t('ended.diag.public'));
+  if (d.local.relay > 0) items.push(t('ended.diag.relay'));
+  let text = t('ended.diag', { items: items.length ? items.join(', ') : t('ended.diag.nothing') });
+  if (settings.useStun && d.local.srflx === 0 && d.candidateErrors.length > 0) text += ' ' + t('ended.diag.stunFailed');
+  return text;
+}
+
+function cleanupUi(resetSetup = true) {
+  clearInterval(ui.callTimer);
+  ui.callTimer = 0;
+  if (ui.localMeter) ui.localMeter.stop();
+  ui.localMeter = null;
+  for (const id of ['preview-video', 'self-video', 'remote-video', 'remote-audio']) {
+    const el = $(id);
+    el.pause();
+    el.srcObject = null;
+  }
+  for (const id of ['dlg-details', 'dlg-cam', 'dlg-talk']) if ($(id).open) $(id).close();
+  banner(null);
+  show('btn-enable-sound', false);
+  setText('call-timer', '');
+  setText('quality', '');
+  $('verify-code').dataset.key = '';
+  $('meter-fill').style.transform = 'scaleX(0)';
+  show('preview', false);
+  show('start-side', false);
+  show('join-side', false);
+  // Remove invitation / reply text from the page once a call is over.
+  if (resetSetup) resetSetupUi();
+}
+
+// ---------------------------------------------------------------- settings
+function openSettings() {
+  $('set-stun').checked = settings.useStun;
+  $('set-relay').value = '';
+  fieldError('relay-error', null);
+  renderRelay();
+  show('settings-next', sessionActive());
+  $('dlg-settings').showModal();
+}
+
+function renderRelay() {
+  const r = settings.relay;
+  show('relay-entry', !r);
+  show('relay-active', !!r);
+  if (r) {
+    setText('relay-active-text', t('settings.relayActive', {
+      label: r.label ? ` (${r.label})` : '',
+      until: new Date(r.expires * 1000).toLocaleString(),
+    }));
+  }
+  $('set-relay-only').disabled = !r;
+  $('set-relay-only').checked = !!r && settings.relayOnly;
+}
+
+// ---------------------------------------------------------------- startup
+function init() {
+  setLocale('en');
+  translateDom(document);
+
+  const sup = mediaSupport();
+  if (!sup.rtc || !sup.gum || !sup.secure || !sup.crypto || !sup.compression || !sup.certificates) {
+    show('unsupported');
+    $('btn-start').disabled = $('btn-join').disabled = true;
+  }
+
+  $('btn-start').addEventListener('click', openStart);
+  $('btn-join').addEventListener('click', openJoin);
+  $('btn-settings').addEventListener('click', openSettings);
+  $('btn-about').addEventListener('click', () => $('dlg-about').showModal());
+  $('btn-start-video').addEventListener('click', () => startCall(true));
+  $('btn-start-audio').addEventListener('click', () => startCall(false));
+  for (const id of ['start-back', 'start-cancel', 'join-back', 'join-cancel']) {
+    $(id).addEventListener('click', () => {
+      if (ui.session) ui.session.end('cancelled');
+      else {
+        cleanupUi();
+        showScreen('welcome');
+      }
+    });
+  }
+
+  $('invite-copy').addEventListener('click', async () => {
+    if (await copyText($('invite-text').value, $('invite-text'), t('invite.copied'))) markDone('start', 1);
+  });
+  $('invite-save').addEventListener('click', () => {
+    saveText($('invite-text').value, t('invite.filename'));
+    markDone('start', 1);
+  });
+  $('reply-copy').addEventListener('click', () => copyText($('reply-out-text').value, $('reply-out-text'), t('reply.copied')));
+  $('reply-save').addEventListener('click', () => saveText($('reply-out-text').value, t('reply.filename')));
+
+  wireInput({ textarea: $('reply-text'), pasteBtn: $('reply-paste'), fileBtn: $('reply-file'), dropzone: $('reply-drop'), onText: handleReplyText });
+  wireInput({ textarea: $('invite-in'), pasteBtn: $('invite-paste'), fileBtn: $('invite-file'), dropzone: $('invite-drop'), onText: handleInviteText });
+  $('file-input').addEventListener('change', (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (f && ui.fileTarget) ui.fileTarget(f);
+  });
+  $('join-cam').addEventListener('click', () => joinCall(true));
+  $('join-mic').addEventListener('click', () => joinCall(false));
+
+  // Dropping a file anywhere: route it to whichever box makes sense, and never
+  // let the browser navigate away from the app to display the file.
+  document.addEventListener('dragover', (e) => e.preventDefault());
+  document.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    const screen = currentScreen();
+    if (screen === 'welcome' && !sessionActive()) {
+      openJoin();
+      await handleDrop(e.dataTransfer, $('invite-in'), handleInviteText);
+    } else if (screen === 'join' && !sessionActive()) {
+      await handleDrop(e.dataTransfer, $('invite-in'), handleInviteText);
+    } else if (screen === 'start' && ui.session && ui.session.state === 'awaiting-reply') {
+      await handleDrop(e.dataTransfer, $('reply-text'), handleReplyText);
+    }
+  });
+
+  // Call controls
+  $('preview-cam').addEventListener('click', toggleCamera);
+  $('ctl-mic').addEventListener('click', toggleMic);
+  $('ctl-cam').addEventListener('click', toggleCamera);
+  $('ctl-hangup').addEventListener('click', hangup);
+  $('ctl-details').addEventListener('click', () => {
+    renderDetails();
+    $('dlg-details').showModal();
+  });
+  $('sec-chip').addEventListener('click', () => {
+    const s = ui.session;
+    if (s && s.verify !== 'confirmed' && s.state === 'connected') {
+      ui.verifyHidden = false;
+      renderVerify();
+      $('btn-match').focus();
+    } else {
+      renderDetails();
+      $('dlg-details').showModal();
+    }
+  });
+  $('btn-match').addEventListener('click', () => ui.session && ui.session.confirmCode());
+  $('btn-speak').addEventListener('click', () => {
+    const s = ui.session;
+    if (s) s.speakForCode(!s.speaking);
+  });
+  $('btn-copy-code').addEventListener('click', async () => {
+    const s = ui.session;
+    if (!s || !s.sas) return;
+    try {
+      await navigator.clipboard.writeText(s.sas);
+      toast(t('call.codeCopied'));
+    } catch {
+      toast(t('copy.manual'));
+    }
+  });
+  $('btn-talk-unverified').addEventListener('click', async () => {
+    const s = ui.session;
+    if (!s) return;
+    if ((await askDialog('dlg-talk')) === 'yes' && ui.session === s) {
+      s.allowTalkUnverified();
+      renderVerify();
+      toast(t('call.talkingUnverified'), 6000);
+    }
+  });
+  $('btn-nomatch').addEventListener('click', () => ui.session && ui.session.rejectCode());
+  $('btn-later').addEventListener('click', () => {
+    ui.verifyHidden = true;
+    renderVerify();
+    $('sec-chip').focus();
+  });
+  $('btn-enable-sound').addEventListener('click', () => {
+    $('remote-audio').play().then(() => show('btn-enable-sound', false), () => {});
+  });
+  $('remote-video').addEventListener('resize', renderRemote);
+  $('remote-video').addEventListener('loadeddata', renderRemote);
+
+  document.addEventListener('keydown', (e) => {
+    if (currentScreen() !== 'call' || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+    if (document.querySelector('dialog[open]')) return;
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    const k = e.key.toLowerCase();
+    if (k === 'm') toggleMic();
+    else if (k === 'v') toggleCamera();
+  });
+
+  $('ended-again').addEventListener('click', () => (ui.flow === 'join' ? openJoin() : openStart()));
+  $('ended-home').addEventListener('click', () => showScreen('welcome'));
+
+  // Settings
+  $('set-stun').addEventListener('change', (e) => {
+    settings.useStun = e.target.checked;
+  });
+  $('set-relay-add').addEventListener('click', () => {
+    const r = parseRelayCode($('set-relay').value);
+    if (!r.ok) return fieldError('relay-error', t('err.' + r.error));
+    fieldError('relay-error', null);
+    settings.relay = r.relay;
+    $('set-relay').value = '';
+    renderRelay();
+  });
+  $('set-relay-remove').addEventListener('click', () => {
+    settings.relay = null;
+    settings.relayOnly = false;
+    renderRelay();
+  });
+  $('set-relay-only').addEventListener('change', (e) => {
+    settings.relayOnly = e.target.checked && !!settings.relay;
+  });
+
+  // Leaving the page ends the call and releases the camera and microphone.
+  window.addEventListener('beforeunload', (e) => {
+    if (sessionActive()) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+  window.addEventListener('pagehide', () => {
+    if (ui.session) ui.session.end('page-closed');
+  });
+
+  showScreen('welcome');
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>

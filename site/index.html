@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PrivateCall is a portable, privacy-focused one-to-one voice and video calling tool built with WebRTC and manual signaling.">
+  <meta name="color-scheme" content="light">
+  <title>PrivateCall — Portable voice and video calls</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: #242424; background: #fff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-size: 16px; line-height: 1.6; }
+    .wrap { max-width: 710px; margin: 0 auto; padding: 0 24px; }
+    header { border-bottom: 1px solid #e3e3e3; }
+    header .wrap { padding-top: 17px; padding-bottom: 17px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+    .name { font-weight: 650; color: #222; text-decoration: none; }
+    nav { display: flex; gap: 20px; }
+    a { color: #23568a; text-underline-offset: 3px; }
+    nav a { color: #555; font-size: 14px; }
+    main { padding: 62px 0 55px; }
+    h1 { font-size: clamp(30px, 5vw, 40px); letter-spacing: -0.035em; font-weight: 650; margin: 0 0 14px; line-height: 1.2; }
+    .lead { font-size: 18px; color: #454545; margin: 0 0 24px; }
+    .download { display: inline-block; padding: 11px 17px; border: 1px solid #23568a; border-radius: 4px; background: #23568a; color: #fff; text-decoration: none; font-weight: 600; }
+    .download:hover, .download:focus-visible { background: #19446e; }
+    .subtle { color: #666; font-size: 14px; }
+    section { margin-top: 47px; }
+    h2 { font-size: 20px; margin: 0 0 12px; font-weight: 630; }
+    ol { padding-left: 24px; }
+    li { padding-left: 4px; margin-bottom: 8px; }
+    .notice { border-left: 3px solid #888; padding-left: 14px; margin-top: 20px; font-size: 14px; color: #505050; }
+    footer { border-top: 1px solid #e3e3e3; color: #666; font-size: 13px; padding: 20px 0 35px; }
+    @media (max-width: 440px) { main { padding-top: 42px; } }
+  </style>
+</head>
+<body>
+  <header><div class="wrap"><a class="name" href="./">PrivateCall</a><nav aria-label="Project links"><a href="https://github.com/alibaki89/PrivateCall">Source code</a><a href="PrivateCall-System-Report.pdf">Technical report</a></nav></div></header>
+  <main class="wrap">
+    <h1>Simple, private voice and video calls.</h1>
+    <p class="lead">PrivateCall is a single HTML file that opens in your desktop browser. No account or installation. Exchange an invitation and a reply, verify a security code, and talk.</p>
+    <p><a class="download" href="https://github.com/alibaki89/PrivateCall/releases/latest/download/PrivateCall.html">Download PrivateCall.html</a></p>
+    <p class="subtle">Version 1.2.0 · Recommended browser: Google Chrome · Free and open source (MIT)</p>
+    <section aria-labelledby="how"><h2 id="how">How to use it</h2><ol>
+      <li>Both people download the file and open it in Chrome.</li>
+      <li>One starts a call and sends the complete invitation in a chat app. The other joins and sends the reply back.</li>
+      <li>Once connected, compare the six-digit security code before talking.</li>
+    </ol><p><a href="PrivateCall-How-To.pdf">Read the step-by-step guide (PDF)</a></p></section>
+    <section aria-labelledby="works"><h2 id="works">How it works</h2><p>PrivateCall uses WebRTC for encrypted one-to-one audio and video. Calls normally connect directly between browsers; some networks require a separately configured TURN relay. Invitations travel through a separate messaging app, not a PrivateCall signaling server.</p><p><a href="PrivateCall-System-Report.pdf">System design and implementation report (PDF)</a> · <a href="https://github.com/alibaki89/PrivateCall">View the source</a></p></section>
+    <p class="notice">PrivateCall is an experimental prototype. It has not been independently security-audited and should not be relied on for high-risk communications. A successful connection does not guarantee anonymity or connectivity on restrictive networks.</p>
+  </main>
+  <footer><div class="wrap">PrivateCall · Version 1.2.0 · <a href="https://github.com/alibaki89/PrivateCall/releases">Releases</a> · <a href="https://github.com/alibaki89/PrivateCall/blob/main/docs/SECURITY.md">Security notes</a></div></footer>
+</body>
+</html>

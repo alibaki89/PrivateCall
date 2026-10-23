@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="{{CSP}}">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="generator" content="PrivateCall {{VERSION}}">
+<title>PrivateCall</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23444'/%3E%3C/svg%3E">
+<style>{{STYLE}}</style>
+</head>
+<body>
+<noscript><p class="noscript">PrivateCall needs JavaScript to run. Open this file in a current version of Chrome, Edge or Firefox.</p></noscript>
+
+<svg width="0" height="0" class="sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></symbol>
+    <symbol id="i-mic-off" viewBox="0 0 24 24"><path d="M15 9.5V6a3 3 0 0 0-5.7-1.3M9 9v2a3 3 0 0 0 5 2.2M5.5 11a6.5 6.5 0 0 0 10.7 5M18.3 13a6.4 6.4 0 0 0 .2-2M12 17.5V21M4 4l16 16"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24"><rect x="3" y="6.5" width="12.5" height="11" rx="2"/><path d="M15.5 10.5 21 7.5v9l-5.5-3"/></symbol>
+    <symbol id="i-cam-off" viewBox="0 0 24 24"><path d="M8 6.5h5a2.5 2.5 0 0 1 2.5 2.5v3.5M15.5 15v.5A2 2 0 0 1 13.5 17.5H5.5A2.5 2.5 0 0 1 3 15V9a2.5 2.5 0 0 1 1.5-2.3M15.5 10.5 21 7.5v9l-3-1.6M4 4l16 16"/></symbol>
+  </defs>
+</svg>
+
+<div class="app" id="app">
+  <header class="topbar" id="topbar">
+    <span class="app-name" data-i18n="app.name"></span>
+    <nav class="topbar-actions">
+      <button type="button" class="link" id="btn-about" data-i18n="top.about"></button>
+      <button type="button" class="link" id="btn-settings" data-i18n="top.settings"></button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- Welcome -->
+    <section class="screen screen-welcome" id="screen-welcome" aria-labelledby="welcome-title" hidden>
+      <div class="page">
+        <h1 id="welcome-title" data-i18n="welcome.title"></h1>
+        <p class="lead" data-i18n="welcome.lead"></p>
+        <p class="notice notice-danger" id="unsupported" role="alert" hidden data-i18n="welcome.unsupported"></p>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary btn-large" id="btn-start" data-i18n="welcome.start"></button>
+          <button type="button" class="btn btn-large" id="btn-join" data-i18n="welcome.join"></button>
+        </div>
+        <h2 data-i18n="welcome.howTitle"></h2>
+        <ol class="plain-list">
+          <li data-i18n="welcome.how1"></li>
+          <li data-i18n="welcome.how2"></li>
+          <li data-i18n="welcome.how3"></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Start a call -->
+    <section class="screen screen-setup" id="screen-start" aria-labelledby="start-title" hidden>
+      <div class="setup">
+        <div class="setup-main">
+          <div class="setup-head">
+            <button type="button" class="link back" id="start-back" data-i18n="common.back"></button>
+            <h1 id="start-title" class="setup-title" tabindex="-1" data-i18n="start.title"></h1>
+          </div>
+
+          <div id="start-type">
+            <p class="notice notice-danger" id="start-media-error" role="alert" hidden></p>
+            <p data-i18n="start.typeQuestion"></p>
+            <div class="btn-row">
+              <button type="button" class="btn btn-primary" id="btn-start-video" data-i18n="start.video"></button>
+              <button type="button" class="btn" id="btn-start-audio" data-i18n="start.audio"></button>
+            </div>
+          </div>
+
+          <ol class="steps" id="start-steps" hidden>
+            <li class="step" id="start-step1">
+              <h2 class="step-title" data-i18n="start.step1"></h2>
+              <p class="step-hint" data-i18n="start.step1Hint"></p>
+              <div class="step-body">
+                <p class="working" id="start-working" role="status"><span id="start-working-text"></span></p>
+                <p class="notice notice-danger" id="start-error" role="alert" hidden></p>
+                <div class="message-out" id="invite-out" hidden>
+                  <textarea dir="ltr" class="message-text" id="invite-text" readonly rows="4" spellcheck="false" aria-labelledby="start-step1-label"></textarea>
+                  <span id="start-step1-label" class="sr-only" data-i18n="start.step1"></span>
+                  <div class="btn-row">
+                    <button type="button" class="btn btn-primary" id="invite-copy"><span data-i18n="common.copy"></span></button>
+                    <button type="button" class="btn" id="invite-save"><span data-i18n="common.save"></span></button>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="step" id="start-step2">
+              <h2 class="step-title" data-i18n="start.step2"></h2>
+              <p class="step-hint" data-i18n="start.step2Hint"></p>
+              <div class="step-body" id="reply-in-wrap" hidden>
+                <div class="dropzone" id="reply-drop">
+                  <textarea dir="ltr" class="message-text" id="reply-text" rows="3" spellcheck="false" data-i18n-placeholder="start.replyPlaceholder" data-i18n-aria="start.step2"></textarea>
+                  <div class="btn-row">
+                    <button type="button" class="btn" id="reply-paste"><span data-i18n="common.paste"></span></button>
+                    <button type="button" class="btn" id="reply-file"><span data-i18n="common.openFile"></span></button>
+                  </div>
+                </div>
+                <p class="field-error" id="reply-error" role="alert" hidden></p>
+                <p class="step-note" data-i18n="start.waitingReply"></p>
+              </div>
+            </li>
+            <li class="step" id="start-step3">
+              <h2 class="step-title" data-i18n="start.step3"></h2>
+              <p class="step-hint" data-i18n="start.step3Hint"></p>
+            </li>
+          </ol>
+          <div class="setup-foot" id="start-foot" hidden>
+            <button type="button" class="btn" id="start-cancel" data-i18n="common.cancel"></button>
+          </div>
+        </div>
+        <aside class="setup-side" id="start-side" hidden></aside>
+      </div>
+    </section>
+
+    <!-- Join a call -->
+    <section class="screen screen-setup" id="screen-join" aria-labelledby="join-title" hidden>
+      <div class="setup">
+        <div class="setup-main">
+          <div class="setup-head">
+            <button type="button" class="link back" id="join-back" data-i18n="common.back"></button>
+            <h1 id="join-title" class="setup-title" tabindex="-1" data-i18n="join.title"></h1>
+          </div>
+          <ol class="steps">
+            <li class="step" id="join-step1">
+              <h2 class="step-title" data-i18n="join.step1"></h2>
+              <p class="step-hint" data-i18n="join.step1Hint"></p>
+              <div class="step-body">
+                <div class="dropzone" id="invite-drop">
+                  <textarea dir="ltr" class="message-text" id="invite-in" rows="3" spellcheck="false" data-i18n-placeholder="join.invitePlaceholder" data-i18n-aria="join.step1"></textarea>
+                  <div class="btn-row">
+                    <button type="button" class="btn" id="invite-paste"><span data-i18n="common.paste"></span></button>
+                    <button type="button" class="btn" id="invite-file"><span data-i18n="common.openFile"></span></button>
+                  </div>
+                </div>
+                <p class="field-error" id="invite-error" role="alert" hidden></p>
+                <div class="invite-summary" id="invite-summary" hidden>
+                  <p><strong id="invite-kind"></strong> <span class="muted" id="invite-age"></span></p>
+                  <p class="notice notice-warn" id="invite-warn" hidden></p>
+                  <div class="btn-row" id="join-actions">
+                    <button type="button" class="btn btn-primary" id="join-cam"><span data-i18n="join.withCamera"></span></button>
+                    <button type="button" class="btn" id="join-mic"><span id="join-mic-label" data-i18n="join.withMic"></span></button>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="step" id="join-step2">
+              <h2 class="step-title" data-i18n="join.step2"></h2>
+              <p class="step-hint" data-i18n="join.step2Hint"></p>
+              <div class="step-body" id="join-step2-body" hidden>
+                <p class="working" id="join-working" role="status"><span id="join-working-text"></span></p>
+                <p class="notice notice-danger" id="join-error" role="alert" hidden></p>
+                <div class="message-out" id="reply-out" hidden>
+                  <textarea dir="ltr" class="message-text" id="reply-out-text" readonly rows="4" spellcheck="false" data-i18n-aria="join.step2"></textarea>
+                  <div class="btn-row">
+                    <button type="button" class="btn btn-primary" id="reply-copy"><span data-i18n="common.copy"></span></button>
+                    <button type="button" class="btn" id="reply-save"><span data-i18n="common.save"></span></button>
+                  </div>
+                  <p class="working" id="join-waiting" role="status"><span id="join-waiting-text" data-i18n="join.waiting"></span></p>
+                </div>
+              </div>
+            </li>
+            <li class="step" id="join-step3">
+              <h2 class="step-title" data-i18n="join.step3"></h2>
+              <p class="step-hint" data-i18n="start.step3Hint"></p>
+            </li>
+          </ol>
+          <div class="setup-foot" id="join-foot" hidden>
+            <button type="button" class="btn" id="join-cancel" data-i18n="common.cancel"></button>
+          </div>
+        </div>
+        <aside class="setup-side" id="join-side" hidden></aside>
+      </div>
+    </section>
+
+    <!-- In call -->
+    <section class="screen screen-call" id="screen-call" aria-labelledby="call-title" hidden>
+      <h1 class="sr-only" id="call-title" tabindex="-1" data-i18n="app.name"></h1>
+      <div class="call-bar">
+        <button type="button" class="status" id="sec-chip" aria-describedby="sec-tip"><span id="sec-chip-text"></span></button>
+        <span class="sr-only" id="sec-tip" data-i18n="call.statusTip"></span>
+        <span class="call-info"><span id="quality"></span><span id="call-timer"></span></span>
+      </div>
+      <div class="stage" id="stage">
+        <video class="remote-video" id="remote-video" autoplay playsinline muted></video>
+        <audio id="remote-audio" autoplay></audio>
+        <p class="stage-text" id="remote-placeholder"><span id="remote-placeholder-text"></span></p>
+        <p class="stage-text" id="call-connecting" role="status"><span data-i18n="call.connecting"></span></p>
+        <p class="call-banner" id="call-banner" role="status" hidden></p>
+        <button type="button" class="btn call-banner" id="btn-enable-sound" hidden data-i18n="call.enableSound"></button>
+
+        <div class="verify" id="verify" role="region" aria-labelledby="verify-title" hidden>
+          <h2 id="verify-title" data-i18n="call.verifyTitle"></h2>
+          <p class="verify-code" id="verify-code"></p>
+          <ol class="verify-steps" id="verify-body">
+            <li id="verify-step-say"></li>
+            <li id="verify-step-hear"></li>
+            <li data-i18n="call.stepConfirm"></li>
+          </ol>
+          <div class="btn-row" id="verify-speak">
+            <button type="button" class="btn" id="btn-speak" aria-pressed="false"><span id="btn-speak-label" data-i18n="call.speak"></span></button>
+            <span class="muted" id="verify-remote-mic"></span>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary" id="btn-match" data-i18n="call.match"></button>
+            <button type="button" class="btn" id="btn-nomatch" data-i18n="call.noMatch"></button>
+            <button type="button" class="link" id="btn-later" data-i18n="call.later"></button>
+          </div>
+          <p class="note" id="verify-private" data-i18n="call.privateUntilConfirm"></p>
+          <p class="note note-ok" id="verify-remote" data-i18n="call.remoteConfirmed" hidden></p>
+          <p class="note" id="verify-strong"><span data-i18n="call.strongShort"></span> <button type="button" class="link" id="btn-copy-code" data-i18n="call.copyCode"></button></p>
+          <p class="note"><button type="button" class="link" id="btn-talk-unverified" data-i18n="call.talkUnverified"></button></p>
+        </div>
+
+        <div class="self-view" id="self-view">
+          <video class="self-video" id="self-video" autoplay playsinline muted></video>
+          <span class="self-off" id="self-off" data-i18n="preview.cameraOff"></span>
+          <span class="self-label" id="self-badge" hidden data-i18n="call.youNotShared"></span>
+          <span class="self-label self-label-end" id="self-muted" hidden data-i18n="call.micNotSent"></span>
+        </div>
+      </div>
+      <div class="controls" role="toolbar" data-i18n-aria="call.controls" id="controls">
+        <button type="button" class="ctl" id="ctl-mic" aria-pressed="true" aria-keyshortcuts="M"><svg class="ic" aria-hidden="true"><use id="ctl-mic-icon" href="#i-mic"/></svg><span data-i18n="call.micLabel"></span></button>
+        <button type="button" class="ctl" id="ctl-cam" aria-pressed="true" aria-keyshortcuts="V"><svg class="ic" aria-hidden="true"><use id="ctl-cam-icon" href="#i-cam"/></svg><span data-i18n="call.camLabel"></span></button>
+        <button type="button" class="ctl" id="ctl-details" data-i18n="call.details"></button>
+        <button type="button" class="ctl ctl-leave" id="ctl-hangup" data-i18n="call.hangup"></button>
+      </div>
+    </section>
+
+    <!-- Ended / failed -->
+    <section class="screen screen-ended" id="screen-ended" aria-labelledby="ended-title" hidden>
+      <div class="page" id="ended-card">
+        <h1 class="ended-title" id="ended-title" tabindex="-1"></h1>
+        <p class="ended-body" id="ended-body"></p>
+        <p class="ended-duration" id="ended-duration" hidden></p>
+        <div class="ended-tips" id="ended-tips" hidden>
+          <h2 data-i18n="ended.tipsTitle"></h2>
+          <ul>
+            <li data-i18n="ended.tip1"></li>
+            <li data-i18n="ended.tip2"></li>
+            <li data-i18n="ended.tip3"></li>
+          </ul>
+          <p class="ended-diag" id="ended-diag"></p>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary" id="ended-again"></button>
+          <button type="button" class="btn" id="ended-home" data-i18n="ended.home"></button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Preview tile template, moved into the active setup screen -->
+<div class="preview" id="preview" hidden>
+  <div class="preview-box">
+    <video class="preview-video" id="preview-video" autoplay playsinline muted></video>
+    <span class="preview-off" id="preview-off" data-i18n="preview.noCamera"></span>
+  </div>
+  <div class="preview-row">
+    <span class="muted" data-i18n="preview.micCheck"></span>
+    <span class="meter" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-aria="preview.micCheck"><span class="meter-fill" id="meter-fill"></span></span>
+  </div>
+  <button type="button" class="btn btn-small" id="preview-cam"><span id="preview-cam-label"></span></button>
+  <p class="muted" id="preview-notice" hidden></p>
+</div>
+
+<dialog class="dialog" id="dlg-settings" aria-labelledby="settings-title">
+  <form method="dialog" class="dialog-inner" id="settings-form">
+    <h2 id="settings-title" data-i18n="settings.title"></h2>
+    <p class="dialog-lead" data-i18n="settings.intro"></p>
+    <label class="check">
+      <input type="checkbox" id="set-stun" checked>
+      <span><span class="check-label" data-i18n="settings.stun"></span><span class="check-hint" data-i18n="settings.stunHint"></span></span>
+    </label>
+    <h3 data-i18n="settings.relayTitle"></h3>
+    <p class="dialog-hint" data-i18n="settings.relayHint"></p>
+    <div id="relay-entry">
+      <textarea dir="ltr" class="message-text" id="set-relay" rows="2" spellcheck="false" data-i18n-placeholder="settings.relayPlaceholder" data-i18n-aria="settings.relayTitle"></textarea>
+      <div class="btn-row"><button type="button" class="btn" id="set-relay-add" data-i18n="settings.relayAdd"></button></div>
+    </div>
+    <p class="field-error" id="relay-error" role="alert" hidden></p>
+    <div id="relay-active" hidden>
+      <p class="notice notice-ok" id="relay-active-text"></p>
+      <div class="btn-row"><button type="button" class="btn" id="set-relay-remove" data-i18n="settings.relayRemove"></button></div>
+    </div>
+    <label class="check" id="relay-only-wrap">
+      <input type="checkbox" id="set-relay-only" disabled>
+      <span><span class="check-label" data-i18n="settings.relayOnly"></span><span class="check-hint" data-i18n="settings.relayOnlyHint"></span></span>
+    </label>
+    <p class="dialog-hint" id="settings-next" hidden data-i18n="settings.appliesNext"></p>
+    <div class="btn-row dialog-actions"><button class="btn btn-primary" value="done" data-i18n="settings.done"></button></div>
+  </form>
+</dialog>
+
+<dialog class="dialog" id="dlg-about" aria-labelledby="about-title">
+  <form method="dialog" class="dialog-inner prose">
+    <h2 id="about-title" data-i18n="about.title"></h2>
+    <p data-i18n="about.p1"></p>
+    <h3 data-i18n="about.h2"></h3>
+    <p data-i18n="about.p2"></p>
+    <h3 data-i18n="about.h3"></h3>
+    <ul>
+      <li data-i18n="about.li1"></li>
+      <li data-i18n="about.li2"></li>
+      <li data-i18n="about.li3"></li>
+      <li data-i18n="about.li4"></li>
+    </ul>
+    <h3 data-i18n="about.h4"></h3>
+    <p data-i18n="about.p4"></p>
+    <p class="build-id">PrivateCall {{VERSION}}</p>
+    <div class="btn-row dialog-actions"><button class="btn btn-primary" value="close" data-i18n="common.close"></button></div>
+  </form>
+</dialog>
+
+<dialog class="dialog" id="dlg-details" aria-labelledby="details-title">
+  <form method="dialog" class="dialog-inner">
+    <h2 id="details-title" data-i18n="details.title"></h2>
+    <dl class="details" id="details-list"></dl>
+    <p class="dialog-hint" data-i18n="details.pathNote"></p>
+    <p class="dialog-hint" id="details-latency"></p>
+    <div class="btn-row dialog-actions"><button class="btn btn-primary" value="close" data-i18n="common.close"></button></div>
+  </form>
+</dialog>
+
+<dialog class="dialog" id="dlg-talk" aria-labelledby="talk-title">
+  <form method="dialog" class="dialog-inner">
+    <h2 id="talk-title" data-i18n="call.talkConfirmTitle"></h2>
+    <p data-i18n="call.talkConfirmBody"></p>
+    <div class="btn-row dialog-actions">
+      <button class="btn btn-primary" value="no" data-i18n="call.camConfirmNo"></button>
+      <button class="btn" value="yes" data-i18n="call.talkConfirmYes"></button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dialog" id="dlg-cam" aria-labelledby="cam-title">
+  <form method="dialog" class="dialog-inner">
+    <h2 id="cam-title" data-i18n="call.camConfirmTitle"></h2>
+    <p data-i18n="call.camConfirmBody"></p>
+    <div class="btn-row dialog-actions">
+      <button class="btn btn-primary" value="no" data-i18n="call.camConfirmNo"></button>
+      <button class="btn" value="yes" data-i18n="call.camConfirmYes"></button>
+    </div>
+  </form>
+</dialog>
+
+<input type="file" id="file-input" accept=".txt,text/plain" hidden>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>{{SCRIPT}}</script>
+</body>
+</html>

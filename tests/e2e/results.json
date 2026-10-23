@@ -1,0 +1,293 @@
+{
+  "date": "2026-10-23T19:05:51.662Z",
+  "browser": "Chromium 153.0.8010.12",
+  "platform": "linux 6.18.44-fc-v153",
+  "metrics": {
+    "inviteMs": 15172,
+    "replyMs": 15140,
+    "connectMs": 383,
+    "inviteChars": 1876,
+    "replyChars": 1841,
+    "inviteCandidates": {
+      "host": 1,
+      "srflx": 0,
+      "relay": 0,
+      "prflx": 0,
+      "mdns": 1,
+      "tcp": 0
+    },
+    "copyWithoutPermission": "Invitation copied. Paste it into a messa",
+    "failDetectMs": 45596
+  },
+  "results": [
+    {
+      "name": "video call: connect, verify, media gating, controls, hang up",
+      "ok": true,
+      "ms": 63281,
+      "checks": [
+        "ok   A shows a 6-digit code (218041)",
+        "ok   both sides show the same code (218041 / 218041)",
+        "ok   status says \"not verified\" before confirmation",
+        "ok   no video track attached to either sender before confirmation",
+        "ok   no video frames received by either side before confirmation",
+        "ok   no microphone track attached to either sender before confirmation",
+        "ok   no audio received by either side before confirmation (bytes: 0/0)",
+        "ok   B hears nothing from A before A opens the microphone",
+        "ok   A sees its microphone shown as not sent",
+        "ok   \"Speak the code\" opens a microphone window",
+        "ok   button shows the countdown",
+        "ok   B hears A while the window is open",
+        "ok   B is told A's microphone is on",
+        "ok   turning the window off detaches the microphone again",
+        "ok   B hears nothing after A closes the window",
+        "ok   DTLS-SRTP in use (SRTP_AES128_CM_HMAC_SHA1_80, DTLS 1.3)",
+        "ok   A sees \"Not shared yet\" on its own camera tile",
+        "ok   B is told the other side confirmed",
+        "ok   A status becomes \"verified\"",
+        "ok   A starts sending video after confirming",
+        "ok   B receives A's video",
+        "ok   A still receives no video (B has not confirmed)",
+        "ok   B shows A's video",
+        "ok   A receives B's video after B confirms",
+        "ok   B hears A (audio energy rising)",
+        "ok   mic button shows off state",
+        "ok   B receives silence while A is muted (energy delta 0.0e+0)",
+        "ok   pressing M unmutes A again",
+        "ok   turning the camera off detaches video from the sender",
+        "ok   and releases the camera device (track stopped)",
+        "ok   B is shown \"Their camera is off\"",
+        "ok   camera can be turned on again (no new exchange needed)",
+        "ok   B receives video again",
+        "ok   details: certificate check matched getStats DTLS certificates",
+        "ok   details: encryption shown",
+        "ok   A: \"You left the call.\"",
+        "ok   B: \"The other person left the call.\"",
+        "ok   all camera/microphone tracks stopped on both sides",
+        "ok   all peer connections closed on both sides",
+        "ok   invitation text removed from the page after the call"
+      ]
+    },
+    {
+      "name": "voice call: no camera requested, camera prompt before verification",
+      "ok": true,
+      "ms": 36333,
+      "checks": [
+        "ok   joining a voice call offers microphone only",
+        "ok   invitation is recognised as a voice call",
+        "ok   camera never requested on either side",
+        "ok   codes match",
+        "ok   remote shown as voice call",
+        "ok   B is warned before sharing camera unverified",
+        "ok   \"Wait\": camera opens locally",
+        "ok   \"Wait\": but nothing is sent",
+        "ok   A receives no video",
+        "ok   after B confirms, A receives B's video (no new exchange needed)",
+        "ok   A sees the call end"
+      ]
+    },
+    {
+      "name": "mitm: substituted certificates give different codes; nothing leaks before verification",
+      "ok": true,
+      "ms": 42443,
+      "checks": [
+        "ok   both victims connect (to the attacker) and the call appears to work",
+        "ok   codes differ (510991 vs 024445)",
+        "ok   attacker relayed the reveal message (commitment check passed on B)",
+        "ok   attacker received no audio from either victim before verification (0/0 bytes)",
+        "ok   attacker received no video from either victim",
+        "ok   during A's \"Speak the code\" window the attacker receives A's audio only (expected: this is what the window is for)",
+        "ok   still no video",
+        "ok   pressing \"They don't match\" ends the call with a safety warning",
+        "ok   devices released"
+      ]
+    },
+    {
+      "name": "mitm: reveal replaced with another value (e.g. replayed from an older call)",
+      "ok": true,
+      "ms": 35739,
+      "checks": [
+        "ok   B ends the call: \"Security check failed\""
+      ]
+    },
+    {
+      "name": "mitm: reveal withheld",
+      "ok": true,
+      "ms": 56215,
+      "checks": [
+        "ok   B gives up after 20 s with \"Security check failed\"",
+        "ok   B never showed a code"
+      ]
+    },
+    {
+      "name": "mitm: injected control messages cannot verify, unlock media or crash the app",
+      "ok": true,
+      "ms": 38391,
+      "checks": [
+        "ok   a forged \"confirmed\" message does not verify B",
+        "ok   and does not unlock B's microphone or camera",
+        "ok   it is shown only as information (\"They confirmed\")",
+        "ok   a reveal sent to the starting side is ignored; codes unchanged",
+        "ok   4002 malformed messages later, both calls are still running",
+        "ok   no script errors on either side"
+      ]
+    },
+    {
+      "name": "limit: impersonation is not detected by the code (documented)",
+      "ok": true,
+      "ms": 15959,
+      "checks": [
+        "ok   someone who receives the invitation and answers it themselves sees the same code (737822 = 737822): the code proves no one is in the middle, not who the other person is"
+      ]
+    },
+    {
+      "name": "mitm: forged commitment is detected automatically",
+      "ok": true,
+      "ms": 35709,
+      "checks": [
+        "ok   B ends the call: \"Security check failed\"",
+        "ok   B never showed a code"
+      ]
+    },
+    {
+      "name": "tamper: modified messages with valid checksums",
+      "ok": true,
+      "ms": 34664,
+      "checks": [
+        "ok   invitation with two-fingerprints is rejected",
+        "ok   invitation with extra-field is rejected",
+        "ok   invitation with bad-media is rejected",
+        "ok   SDP the WebRTC engine rejects gives a clear \"isn’t valid\" message",
+        "ok   and the microphone is released",
+        "ok   markup inside SDP is never rendered or executed",
+        "ok   reply with another session ID is refused",
+        "ok   the genuine reply still works afterwards"
+      ]
+    },
+    {
+      "name": "tamper: certificate fingerprint swapped in transit (no SAS bypass)",
+      "ok": true,
+      "ms": 76965,
+      "checks": [
+        "ok   DTLS refuses the connection; A sees \"Couldn’t connect\"",
+        "ok   no code was ever shown",
+        "ok   failure screen shows things to try"
+      ]
+    },
+    {
+      "name": "input errors: wrong kind, truncated, corrupted, oversized, garbage",
+      "ok": true,
+      "ms": 35892,
+      "checks": [
+        "ok   reply pasted as invitation: \"This is a reply, not an invitation. Paste it on the computer that star…\"",
+        "ok   reply pasted as invitation: join buttons stay hidden",
+        "ok   truncated (last lines lost): \"Part of the message is missing. Copy everything from “PrivateCall.” to…\"",
+        "ok   truncated (last lines lost): join buttons stay hidden",
+        "ok   truncated (middle lines lost): \"This message was damaged or changed on the way. Ask for a new one, ide…\"",
+        "ok   truncated (middle lines lost): join buttons stay hidden",
+        "ok   one character changed: \"This message was damaged or changed on the way. Ask for a new one, ide…\"",
+        "ok   one character changed: join buttons stay hidden",
+        "ok   oversized (50 000 characters): \"This is too large to be a PrivateCall message.…\"",
+        "ok   oversized (50 000 characters): join buttons stay hidden",
+        "ok   unrelated text: \"This doesn’t look like a PrivateCall message. Make sure you copied the…\"",
+        "ok   unrelated text: join buttons stay hidden",
+        "ok   newer protocol version: \"This was made with a newer version of PrivateCall. You both need the s…\"",
+        "ok   newer protocol version: join buttons stay hidden",
+        "ok   invitation pasted as reply is recognised",
+        "ok   a 100 KB file is refused before reading",
+        "ok   a binary file is reported as not an invitation"
+      ]
+    },
+    {
+      "name": "replay: invitations and replies work once",
+      "ok": true,
+      "ms": 46902,
+      "checks": [
+        "ok   the same invitation cannot be joined twice in one window",
+        "ok   a reply to an earlier invitation is refused"
+      ]
+    },
+    {
+      "name": "files: save invitation, open it, drag-and-drop reply",
+      "ok": true,
+      "ms": 30916,
+      "checks": [
+        "ok   download is named PrivateCall-invitation.txt",
+        "ok   saved file contains exactly the invitation",
+        "ok   step 1 is marked done after saving",
+        "ok   dropping the invitation file on the welcome screen opens \"Join\" with it",
+        "ok   dropping the reply file connects the call"
+      ]
+    },
+    {
+      "name": "clipboard: copy and paste buttons",
+      "ok": true,
+      "ms": 31186,
+      "checks": [
+        "ok   Copy puts the exact invitation on the clipboard (permission granted)",
+        "ok   Paste button reads the invitation from the clipboard",
+        "ok   without permission, copy falls back and tells the user (\"Invitation copied. Paste it into a messa…\")"
+      ]
+    },
+    {
+      "name": "failure: reply from a closed window shows \"Couldn’t connect\"",
+      "ok": true,
+      "ms": 76726,
+      "checks": [
+        "ok   A shows \"Couldn’t connect\" after 46 s",
+        "ok   diagnostics summary shown: What your computer found: local network address. The public helper servers couldn’t be reached from your network.",
+        "ok   microphone released"
+      ]
+    },
+    {
+      "name": "remote reload during a call ends it cleanly on the other side",
+      "ok": true,
+      "ms": 31454,
+      "checks": [
+        "ok   B was asked to confirm leaving during the call",
+        "ok   A notices within 0.1 s",
+        "ok   A released its devices"
+      ]
+    },
+    {
+      "name": "verification UI: check later, reopen, unverified status",
+      "ok": true,
+      "ms": 31561,
+      "checks": [
+        "ok   \"Check later\" hides the code panel",
+        "ok   status stays \"Encrypted · not verified\"",
+        "ok   video stays held while unverified",
+        "ok   clicking the status reopens the code"
+      ]
+    },
+    {
+      "name": "settings: relay codes, relay-only mode, helper servers off",
+      "ok": true,
+      "ms": 31218,
+      "checks": [
+        "ok   invalid relay code rejected",
+        "ok   valid relay code accepted",
+        "ok   relay-only option enabled once a relay exists",
+        "ok   unreachable relay in relay-only mode is reported before anything is sent",
+        "ok   no invitation produced",
+        "ok   with helper servers off, only local candidates are offered ({\"host\":1,\"srflx\":0,\"relay\":0,\"prflx\":0,\"mdns\":1,\"tcp\":0})",
+        "ok   no STUN/TURN servers configured on the connection"
+      ]
+    },
+    {
+      "name": "slow exchange: reply added 60 s after it was created",
+      "ok": true,
+      "ms": 91372,
+      "checks": [
+        "ok   connects and verifies after a 60 s delay (same machine; no NAT involved)"
+      ]
+    },
+    {
+      "name": "layout: right-to-left rendering and narrow window",
+      "ok": true,
+      "ms": 15597,
+      "checks": [
+        "ok   no horizontal overflow at 760 px"
+      ]
+    }
+  ]
+}

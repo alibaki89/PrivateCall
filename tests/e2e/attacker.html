@@ -1,0 +1,174 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Test-only attacker harness</title>
+<!--
+  TEST HARNESS ONLY - never shipped. Simulates an adversary who controls the
+  channel used to exchange the invitation and reply (e.g. a compromised chat app).
+  Loads the app's own codec modules directly, so it needs Chromium launched with
+  --allow-file-access-from-files.
+-->
+<script type="module">
+import { decodeEnvelope, encodeEnvelope } from '../../src/app/codec.js';
+import { randomBytes, base64urlEncode, base64urlDecode } from '../../src/app/util.js';
+import { inspectSdp } from '../../src/app/sdp.js';
+import { deriveSas } from '../../src/app/sas.js';
+
+const M = { log: [], ready: true, revealMode: 'forward' };
+window.M = M;
+
+function makePeer() {
+  const pc = new RTCPeerConnection();
+  const dc = pc.createDataChannel('control', { negotiated: true, id: 0 });
+  const queue = [];
+  return { pc, dc, queue };
+}
+
+function gather(pc) {
+  return new Promise((resolve) => {
+    if (pc.iceGatheringState === 'complete') return resolve();
+    pc.addEventListener('icegatheringstatechange', () => pc.iceGatheringState === 'complete' && resolve());
+    setTimeout(resolve, 4000);
+  });
+}
+
+function relay(from, to, label) {
+  from.dc.onmessage = (e) => {
+    M.log.push(label + ' ' + e.data);
+    let data = e.data;
+    if (label === 'A->B' && data.includes('"reveal"')) {
+      if (M.revealMode === 'drop') return;
+      // A "replayed" value: anything other than the committed nonce (e.g. from an older call).
+      if (M.revealMode === 'replace') data = JSON.stringify({ t: 'reveal', na: base64urlEncode(randomBytes(32)) });
+    }
+    if (to.dc.readyState === 'open') to.dc.send(data);
+    else to.queue.push(data);
+  };
+  to.dc.addEventListener('open', () => {
+    while (to.queue.length) to.dc.send(to.queue.shift());
+  });
+}
+
+// Person-in-the-middle: replace the invitation's certificate with ours.
+// forgeCommit=true also replaces the commitment (attacker tries its own nonce).
+M.interceptInvite = async (text, { forgeCommit = false } = {}) => {
+  const d = await decodeEnvelope(text);
+  M.invite = d.payload;
+  const b = (M.b = makePeer());
+  M.bAudio = b.pc.addTransceiver('audio', { direction: 'sendrecv' });
+  M.bVideo = b.pc.addTransceiver('video', { direction: 'sendrecv' });
+  await b.pc.setLocalDescription();
+  await gather(b.pc);
+  const commit = forgeCommit ? base64urlEncode(randomBytes(32)) : d.payload.commit;
+  return encodeEnvelope('invite', { ...d.payload, commit, sdp: b.pc.localDescription.sdp }, 'Forwarded invitation');
+};
+
+M.interceptReply = async (text) => {
+  const d = await decodeEnvelope(text);
+  const a = (M.a = makePeer());
+  await a.pc.setRemoteDescription({ type: 'offer', sdp: M.invite.sdp });
+  const [aAudio, aVideo] = a.pc.getTransceivers();
+  for (const t of a.pc.getTransceivers()) t.direction = 'sendrecv';
+  await a.pc.setLocalDescription();
+  await gather(a.pc);
+  await M.b.pc.setRemoteDescription({ type: 'answer', sdp: d.payload.sdp });
+  relay(M.a, M.b, 'A->B');
+  relay(M.b, M.a, 'B->A');
+  // Relay media both ways so the call "works" for both victims.
+  await M.bAudio.sender.replaceTrack(aAudio.receiver.track);
+  await M.bVideo.sender.replaceTrack(aVideo.receiver.track);
+  await aAudio.sender.replaceTrack(M.bAudio.receiver.track);
+  await aVideo.sender.replaceTrack(M.bVideo.receiver.track);
+  return encodeEnvelope('reply', { ...d.payload, sdp: a.pc.localDescription.sdp }, 'Forwarded reply');
+};
+
+// What the attacker has received from each victim so far (media it could record).
+M.received = async () => {
+  const out = {};
+  for (const [side, peer] of [['fromA', M.a], ['fromB', M.b]]) {
+    if (!peer) continue;
+    const o = { audioBytes: 0, audioEnergy: 0, videoFrames: 0 };
+    (await peer.pc.getStats()).forEach((s) => {
+      if (s.type === 'inbound-rtp' && s.kind === 'audio') {
+        o.audioBytes = s.bytesReceived || 0;
+        o.audioEnergy = s.totalAudioEnergy || 0;
+      }
+      if (s.type === 'inbound-rtp' && s.kind === 'video') o.videoFrames = s.framesDecoded || 0;
+    });
+    out[side] = o;
+  }
+  return out;
+};
+
+// Send arbitrary control messages to a victim over the (attacker-terminated) channel.
+M.inject = (side, messages) => {
+  const peer = side === 'A' ? M.a : M.b;
+  for (const m of messages) peer.dc.send(typeof m === 'string' ? m : JSON.stringify(m));
+  return messages.length;
+};
+
+M.flood = (side, n) => {
+  const junk = ['{', 'null', '[]', '{"t":"eval","x":1}', '{"t":"state","mic":"yes","cam":1}', '{"t":"reveal","na":"AAAA"}',
+    JSON.stringify({ t: 'state', mic: true, cam: true, extra: 'x'.repeat(600) }), '\u0000'.repeat(100), '{"__proto__":{"t":"bye"}}'];
+  const peer = side === 'A' ? M.a : M.b;
+  for (let i = 0; i < n; i++) peer.dc.send(junk[i % junk.length]);
+  peer.dc.send(new Uint8Array(1000)); // binary message
+  return n + 1;
+};
+
+// Impersonation: answer A's invitation directly, pretending to be B (no relay to
+// anyone). The security code cannot detect this -- the attacker IS the endpoint.
+M.impersonate = async (text) => {
+  const d = await decodeEnvelope(text);
+  const a = (M.a = makePeer());
+  await a.pc.setRemoteDescription({ type: 'offer', sdp: d.payload.sdp });
+  for (const t of a.pc.getTransceivers()) t.direction = 'sendrecv';
+  await a.pc.setLocalDescription();
+  await gather(a.pc);
+  const nb = randomBytes(32);
+  M.code = new Promise((resolve) => {
+    a.dc.onmessage = async (e) => {
+      const m = JSON.parse(e.data);
+      if (m.t !== 'reveal') return;
+      resolve(await deriveSas({
+        sid: base64urlDecode(d.payload.sid),
+        offerFingerprint: inspectSdp(d.payload.sdp, 'offer').fingerprint,
+        answerFingerprint: inspectSdp(a.pc.localDescription.sdp, 'answer').fingerprint,
+        nonceA: base64urlDecode(m.na),
+        nonceB: nb,
+      }));
+    };
+  });
+  return encodeEnvelope('reply', { v: 1, sid: d.payload.sid, ts: Math.floor(Date.now() / 1000), nb: base64urlEncode(nb), sdp: a.pc.localDescription.sdp }, 'Fake reply');
+};
+M.impersonatorCode = () => M.code;
+
+// Re-encode a valid message after modifying it (checksum recomputed), to test
+// that validation does not rely on the checksum.
+M.tamper = async (text, how) => {
+  const d = await decodeEnvelope(text);
+  const p = { ...d.payload };
+  if (how === 'two-fingerprints') {
+    const fp = /a=fingerprint:sha-256 (\S+)/.exec(p.sdp)[1];
+    const other = fp.replace(/^../, fp.startsWith('AA') ? 'BB' : 'AA');
+    let n = 0;
+    p.sdp = p.sdp.replace(/a=fingerprint:sha-256 \S+/g, (m) => (n++ === 1 ? 'a=fingerprint:sha-256 ' + other : m));
+  } else if (how === 'extra-field') {
+    p.debug = true;
+  } else if (how === 'bad-media') {
+    p.media = 'screen';
+  } else if (how === 'script-in-sdp') {
+    p.sdp = p.sdp.replace('s=-\r\n', 's=<img src=x onerror=alert(1)>\r\n');
+  } else if (how === 'swap-sid') {
+    p.sid = base64urlEncode(randomBytes(16));
+  } else if (how === 'browser-rejects') {
+    // Structurally fine for PrivateCall's checks, but invalid for the WebRTC engine.
+    p.sdp = p.sdp.replace(/a=rtpmap:(\d+) opus\/48000\/2/, 'a=rtpmap:$1 opus/abc/2').replace(/a=mid:0\r\n/, 'a=mid:0\r\na=mid:9\r\n');
+  } else if (how === 'swap-fingerprint') {
+    // Replace every fingerprint with a different (consistent) value.
+    const fp = /a=fingerprint:sha-256 (\S+)/.exec(p.sdp)[1];
+    const other = fp.split(':').map((x) => (x === 'AA' ? 'BB' : 'AA')).join(':');
+    p.sdp = p.sdp.replaceAll(fp, other);
+  }
+  return encodeEnvelope(d.kind, p, 'Tampered');
+};
+</script>

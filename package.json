@@ -1,0 +1,21 @@
+{
+  "name": "privatecall",
+  "version": "1.2.0",
+  "private": true,
+  "description": "Portable, single-file, end-to-end encrypted 1:1 voice and video calls with manual signaling and short-authentication-string verification.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node build.mjs --check",
+    "test": "node --test tests/unit/*.test.mjs",
+    "test:e2e": "node tests/e2e/run.mjs",
+    "test:netlab": "node tests/netlab/run.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
