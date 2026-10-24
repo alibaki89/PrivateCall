@@ -14,8 +14,8 @@ import { parseRelayCode, buildIceConfig, DEFAULT_STUN } from '../../src/app/ice.
 import { gatherDecision, GATHER_POLICY, relayUrlsOf } from '../../src/app/gather.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const OFFER = fs.readFileSync(path.join(here, '../fixtures/chrome-offer.sdp'), 'utf8');
-const ANSWER = fs.readFileSync(path.join(here, '../fixtures/chrome-answer.sdp'), 'utf8');
+const OFFER = fs.readFileSync(path.join(here, '../fixtures/chrome-offer.sdp'), 'utf8').replace(/\r?\n/g, '\r\n');
+const ANSWER = fs.readFileSync(path.join(here, '../fixtures/chrome-answer.sdp'), 'utf8').replace(/\r?\n/g, '\r\n');
 
 // Deterministic PRNG so fuzz failures are reproducible.
 function prng(seed) {

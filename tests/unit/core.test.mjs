@@ -13,8 +13,8 @@ import { makeCommit, checkCommit, deriveSas } from '../../src/app/sas.js';
 import { parseRelayCode, buildIceConfig } from '../../src/app/ice.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const OFFER = fs.readFileSync(path.join(here, '../fixtures/chrome-offer.sdp'), 'utf8');
-const ANSWER = fs.readFileSync(path.join(here, '../fixtures/chrome-answer.sdp'), 'utf8');
+const OFFER = fs.readFileSync(path.join(here, '../fixtures/chrome-offer.sdp'), 'utf8').replace(/\r?\n/g, '\r\n');
+const ANSWER = fs.readFileSync(path.join(here, '../fixtures/chrome-answer.sdp'), 'utf8').replace(/\r?\n/g, '\r\n');
 const b64u = (n) => util.base64urlEncode(util.randomBytes(n));
 
 function invitePayload(over = {}) {
